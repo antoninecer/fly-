@@ -1,0 +1,31 @@
+FLY2 checkpoint
+
+Done:
+- Flutter SDK downloaded and unpacked
+- FLY2 directory created
+- maps/source contains at least europe_med_satellite_legacy.mbtiles
+- world_base_z4_z5 exists elsewhere
+- europe_detail_z6_z7 exists elsewhere
+
+Blocked:
+- Xcode needs disk space
+- CocoaPods not installed yet
+- flutter create not finished yet
+
+Next:
+1. Free disk space
+2. Install full Xcode
+3. Run:
+   sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+   sudo xcodebuild -runFirstLaunch
+4. Install CocoaPods
+5. Run:
+   flutter doctor
+6. In ~/work/FLY2:
+   flutter create . --platforms=android,ios,linux,macos
+7. Copy docs:
+   cp ../FLY/GEMINI.md docs/GEMINI.md
+   cp ../FLY/PROGRESS.md docs/PROGRESS.md
+8. Copy map packages:
+   world_base_z4_z5.mbtiles
+   europe_detail_z6_z7.mbtiles
