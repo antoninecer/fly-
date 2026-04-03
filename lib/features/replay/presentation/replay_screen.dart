@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong2.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:drift/drift.dart' as drift;
 import '../../../data/db/app_database.dart';
 import '../../../data/services/demo_data_service.dart';
 import '../../../data/services/poi_service.dart';
+import '../../../data/services/context_engine.dart';
+import '../../../data/services/vector_data_service.dart';
+import '../../../data/services/asset_service.dart';
 import '../../../map/widgets/live_map.dart';
+import '../../../shared/widgets/underflight_info_card.dart';
 
 class ReplayScreen extends StatefulWidget {
   const ReplayScreen({super.key});
@@ -16,58 +21,63 @@ class ReplayScreen extends StatefulWidget {
 class _ReplayScreenState extends State<ReplayScreen> {
   late AppDatabase _db;
   late PoiService _poiService;
+  late VectorDataService _vectorService;
+  late AssetService _assetService;
+  ContextEngine? _contextEngine;
   List<TrackPoint> _allPoints = [];
+  UnderflightContext? _activeContext;
+  
   int _currentIndex = 0;
   bool _isPlaying = false;
   double _speedMultiplier = 1.0;
   Timer? _timer;
-  String? _poiAlert;
-
-  final List<String> _mbtilesPaths = [
-    'data/maps/source/world_base_z4_z5.mbtiles',
-    'data/maps/source/europe_detail_z6_z7.mbtiles',
-  ];
+  List<String> _mbtilesPaths = [];
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
     _db = AppDatabase();
     _poiService = PoiService();
+    _vectorService = VectorDataService();
+    _assetService = AssetService();
     _initData();
   }
 
   Future<void> _initData() async {
+    // 1. Initialize Assets (Copy to local storage)
+    final paths = await _assetService.initializeAssets();
+    
+    // 2. Load POIs and Vector Data (Now using local paths)
     await _poiService.loadBasePois();
+    await _vectorService.loadAll();
+    _contextEngine = ContextEngine(pois: _poiService.allPois);
+
+    // 3. Seed and Load Track Points
     final demoService = DemoDataService(_db);
     await demoService.seedPragueToNaples();
     
     final points = await (_db.select(_db.trackPoints)
           ..where((t) => t.sessionId.equals('demo-prague-naples'))
-          ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+          ..orderBy([(t) => drift.OrderingTerm.asc(t.timestamp)]))
         .get();
 
     if (mounted) {
       setState(() {
+        _mbtilesPaths = paths;
         _allPoints = points;
+        _initialized = true;
       });
     }
   }
 
-  void _checkContext(LatLng location) {
-    final nearby = _poiService.getNearby(location, 50.0);
-    if (nearby.isNotEmpty) {
-      final closest = nearby.first;
-      if (_poiAlert != closest.name) {
-        setState(() {
-          _poiAlert = closest.name;
-        });
-      }
-    } else {
-      if (_poiAlert != null) {
-        setState(() {
-          _poiAlert = null;
-        });
-      }
+  void _updateContext(LatLng location) {
+    if (_contextEngine == null) return;
+    final ctx = _contextEngine!.update(location);
+    if (ctx != _activeContext) {
+      setState(() {
+        _activeContext = ctx;
+      });
     }
   }
 
@@ -89,7 +99,7 @@ class _ReplayScreenState extends State<ReplayScreen> {
         setState(() {
           _currentIndex++;
           final p = _allPoints[_currentIndex];
-          _checkContext(LatLng(p.lat, p.lon));
+          _updateContext(LatLng(p.lat, p.lon));
         });
       } else {
         setState(() {
@@ -109,8 +119,17 @@ class _ReplayScreenState extends State<ReplayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_allPoints.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+    if (!_initialized || _allPoints.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Initializing offline data...'),
+          ],
+        ),
+      );
     }
 
     final currentPoint = _allPoints[_currentIndex];
@@ -129,15 +148,20 @@ class _ReplayScreenState extends State<ReplayScreen> {
               currentLocation: currentLocation,
               heading: currentPoint.headingDeg,
               pois: _poiService.allPois,
+              borders: _vectorService.borders,
+              rivers: _vectorService.rivers,
+              autoCenter: true, // Aircraft stays in center!
             ),
           ),
 
-          if (_poiAlert != null)
+          if (_activeContext != null)
             Positioned(
-              top: 140,
-              left: 12,
               right: 12,
-              child: _PoiAlertBadge(name: _poiAlert!),
+              bottom: 140,
+              child: UnderflightInfoCard(
+                poi: _activeContext!.poi,
+                distanceKm: _activeContext!.distanceKm,
+              ),
             ),
 
           Positioned(
@@ -181,7 +205,7 @@ class _ReplayScreenState extends State<ReplayScreen> {
               onScrubChanged: (value) {
                 setState(() {
                   _currentIndex = value.toInt();
-                  _checkContext(LatLng(_allPoints[_currentIndex].lat, _allPoints[_currentIndex].lon));
+                  _updateContext(LatLng(_allPoints[_currentIndex].lat, _allPoints[_currentIndex].lon));
                 });
               },
               onPlayToggle: _togglePlay,
@@ -191,34 +215,6 @@ class _ReplayScreenState extends State<ReplayScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _PoiAlertBadge extends StatelessWidget {
-  final String name;
-  const _PoiAlertBadge({required this.name});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        color: Colors.amber.withValues(alpha: 0.9),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.info_outline, color: Colors.black),
-              const SizedBox(width: 8),
-              Text(
-                'Blížíte se k: $name',
-                style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
