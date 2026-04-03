@@ -16,17 +16,8 @@ class MapRegistry {
       name: 'Europe Detail',
       fileName: 'europe_detail_z6_z7.mbtiles',
       minZoom: 6,
-      maxZoom: 7,
+      maxZoom: 9,
       priority: 10,
-      isFallback: false,
-    ),
-    MapPackage(
-      id: 'europe_legacy',
-      name: 'Europe Legacy',
-      fileName: 'europe_med_satellite_legacy.mbtiles',
-      minZoom: 4,
-      maxZoom: 6,
-      priority: 0,
       isFallback: false,
     ),
   ];

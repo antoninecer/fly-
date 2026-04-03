@@ -37,12 +37,14 @@ class LiveMap extends StatefulWidget {
 class _LiveMapState extends State<LiveMap> {
   late final MbTilesTileProvider _tileProvider;
   late final MapController _mapController;
+
   double _currentZoom = 5;
 
-  // Layer Visibility Toggles
   bool _showBorders = true;
   bool _showRivers = true;
   bool _showPois = true;
+
+  int _layerMode = 0;
 
   @override
   void initState() {
@@ -50,13 +52,14 @@ class _LiveMapState extends State<LiveMap> {
     _tileProvider = MbTilesTileProvider(paths: widget.mbtilesPaths);
     _mapController = MapController();
     _currentZoom = widget.initialZoom;
+    _applyZoomPreset(_currentZoom);
   }
 
   @override
   void didUpdateWidget(LiveMap oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.autoCenter && 
-        widget.currentLocation != null && 
+    if (widget.autoCenter &&
+        widget.currentLocation != null &&
         widget.currentLocation != oldWidget.currentLocation) {
       _mapController.move(widget.currentLocation!, _currentZoom);
     }
@@ -69,6 +72,93 @@ class _LiveMapState extends State<LiveMap> {
     super.dispose();
   }
 
+  void _applyZoomPreset(double zoom) {
+    if (zoom < 5) {
+      _showBorders = false;
+      _showRivers = false;
+      _showPois = false;
+    } else if (zoom < 6) {
+      _showBorders = true;
+      _showRivers = true;
+      _showPois = false;
+    } else {
+      _showBorders = true;
+      _showRivers = true;
+      _showPois = true;
+    }
+  }
+
+  void _cycleLayers() {
+    setState(() {
+      _layerMode = (_layerMode + 1) % 5;
+
+      switch (_layerMode) {
+        case 0:
+          _applyZoomPreset(_currentZoom);
+          break;
+        case 1:
+          _showBorders = true;
+          _showRivers = true;
+          _showPois = true;
+          break;
+        case 2:
+          _showBorders = true;
+          _showRivers = true;
+          _showPois = false;
+          break;
+        case 3:
+          _showBorders = true;
+          _showRivers = false;
+          _showPois = false;
+          break;
+        case 4:
+          _showBorders = false;
+          _showRivers = false;
+          _showPois = false;
+          break;
+      }
+    });
+  }
+
+  String _layerLabel() {
+    switch (_layerMode) {
+      case 0:
+        return 'AUTO';
+      case 1:
+        return 'ALL';
+      case 2:
+        return 'MAP+R';
+      case 3:
+        return 'MAP';
+      case 4:
+        return 'OFF';
+      default:
+        return 'AUTO';
+    }
+  }
+
+  void _zoomIn() {
+    final nextZoom = (_currentZoom + 1).clamp(4.0, 9.0);
+    _mapController.move(_mapController.camera.center, nextZoom);
+    setState(() {
+      _currentZoom = nextZoom;
+      if (_layerMode == 0) {
+        _applyZoomPreset(_currentZoom);
+      }
+    });
+  }
+
+  void _zoomOut() {
+    final nextZoom = (_currentZoom - 1).clamp(4.0, 9.0);
+    _mapController.move(_mapController.camera.center, nextZoom);
+    setState(() {
+      _currentZoom = nextZoom;
+      if (_layerMode == 0) {
+        _applyZoomPreset(_currentZoom);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -78,36 +168,31 @@ class _LiveMapState extends State<LiveMap> {
           options: MapOptions(
             initialCenter: widget.initialCenter,
             initialZoom: widget.initialZoom,
-            maxZoom: 18,
-            minZoom: 2,
+            minZoom: 4,
+            maxZoom: 9,
             onPositionChanged: (camera, hasGesture) {
-              if (mounted) {
-                setState(() {
-                  _currentZoom = camera.zoom;
-                });
-              }
+              if (!mounted) return;
+              setState(() {
+                _currentZoom = camera.zoom;
+                if (_layerMode == 0) {
+                  _applyZoomPreset(_currentZoom);
+                }
+              });
             },
           ),
           children: [
-            // 1. Base MBTiles Layer (Smart switching inside provider)
             TileLayer(
               tileProvider: _tileProvider,
               maxNativeZoom: 7,
             ),
-
-            // 2. Borders: Zoom 5+
             if (_showBorders && _currentZoom >= 5)
               PolylineLayer(
                 polylines: widget.borders,
               ),
-
-            // 3. Rivers: Zoom 6+
-            if (_showRivers && _currentZoom >= 6)
+            if (_showRivers && _currentZoom >= 5)
               PolylineLayer(
                 polylines: widget.rivers,
               ),
-
-            // 4. Track Path
             if (widget.track != null && widget.track!.isNotEmpty)
               PolylineLayer(
                 polylines: [
@@ -118,8 +203,6 @@ class _LiveMapState extends State<LiveMap> {
                   ),
                 ],
               ),
-
-            // 5. POIs: Zoom 6+ (Cities, Airports)
             if (_showPois && _currentZoom >= 6)
               MarkerLayer(
                 markers: widget.pois.map((poi) {
@@ -136,7 +219,9 @@ class _LiveMapState extends State<LiveMap> {
                             color: Colors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+                            shadows: [
+                              Shadow(blurRadius: 4, color: Colors.black),
+                            ],
                           ),
                         ),
                       ],
@@ -144,8 +229,6 @@ class _LiveMapState extends State<LiveMap> {
                   );
                 }).toList(),
               ),
-
-            // 6. Aircraft
             if (widget.currentLocation != null)
               MarkerLayer(
                 markers: [
@@ -159,7 +242,9 @@ class _LiveMapState extends State<LiveMap> {
                         Icons.flight,
                         color: Colors.white,
                         size: 32,
-                        shadows: [Shadow(blurRadius: 10, color: Colors.black)],
+                        shadows: [
+                          Shadow(blurRadius: 10, color: Colors.black),
+                        ],
                       ),
                     ),
                   ),
@@ -167,18 +252,75 @@ class _LiveMapState extends State<LiveMap> {
               ),
           ],
         ),
-
-        // Layer Toggle UI
         Positioned(
-          top: 80,
+          top: 138,
           right: 12,
           child: Column(
             children: [
-              _layerButton(Icons.map, _showBorders, () => setState(() => _showBorders = !_showBorders)),
+              FloatingActionButton.small(
+                heroTag: 'layers_cycle',
+                onPressed: _cycleLayers,
+                backgroundColor: Colors.black87,
+                child: const Icon(Icons.layers, color: Colors.white),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _layerLabel(),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               const SizedBox(height: 8),
-              _layerButton(Icons.waves, _showRivers, () => setState(() => _showRivers = !_showRivers)),
-              const SizedBox(height: 8),
-              _layerButton(Icons.location_city, _showPois, () => setState(() => _showPois = !_showPois)),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  children: [
+                    IconButton(
+                      onPressed: _zoomIn,
+                      icon: const Icon(Icons.add, color: Colors.white),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    Container(
+                      width: 32,
+                      height: 1,
+                      color: Colors.white24,
+                    ),
+                    IconButton(
+                      onPressed: _zoomOut,
+                      icon: const Icon(Icons.remove, color: Colors.white),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Z ${_currentZoom.toStringAsFixed(1)}',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -186,20 +328,32 @@ class _LiveMapState extends State<LiveMap> {
     );
   }
 
-  Widget _layerButton(IconData icon, bool active, VoidCallback onTap) {
-    return FloatingActionButton.small(
-      onPressed: onTap,
-      backgroundColor: active ? Colors.blueAccent : Colors.black87,
-      child: Icon(icon, color: active ? Colors.white : Colors.white54),
-    );
-  }
-
   Widget _getPoiIcon(PoiType type) {
     switch (type) {
-      case PoiType.city: return const Icon(Icons.location_city, color: Colors.amber, size: 20);
-      case PoiType.mountain: return const Icon(Icons.landscape, color: Colors.brown, size: 20);
-      case PoiType.river: return const Icon(Icons.waves, color: Colors.blue, size: 20);
-      case PoiType.airport: return const Icon(Icons.local_airport, color: Colors.green, size: 20);
+      case PoiType.city:
+        return const Icon(
+          Icons.location_city,
+          color: Colors.amber,
+          size: 20,
+        );
+      case PoiType.mountain:
+        return const Icon(
+          Icons.landscape,
+          color: Colors.brown,
+          size: 20,
+        );
+      case PoiType.river:
+        return const Icon(
+          Icons.waves,
+          color: Colors.blue,
+          size: 20,
+        );
+      case PoiType.airport:
+        return const Icon(
+          Icons.local_airport,
+          color: Colors.green,
+          size: 20,
+        );
     }
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong2.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:intl/intl.dart';
 import '../../../data/db/app_database.dart';
@@ -13,7 +13,7 @@ import '../../../map/widgets/live_map.dart';
 import '../../../shared/widgets/underflight_info_card.dart';
 
 class ReplayScreen extends StatefulWidget {
-  final String? sessionId; // Allow playing specific session
+  final String? sessionId;
 
   const ReplayScreen({super.key, this.sessionId});
 
@@ -27,11 +27,12 @@ class _ReplayScreenState extends State<ReplayScreen> {
   late VectorDataService _vectorService;
   late AssetService _assetService;
   ContextEngine? _contextEngine;
-  
+  dynamic _activeContext;
+
   List<TrackPoint> _allPoints = [];
   int _currentIndex = 0;
-  double _virtualTimeOffsetSec = 0; // Current playback time in seconds from start
-  
+  double _virtualTimeOffsetSec = 0;
+
   bool _isPlaying = false;
   double _speedMultiplier = 1.0;
   Timer? _timer;
@@ -58,12 +59,12 @@ class _ReplayScreenState extends State<ReplayScreen> {
     _contextEngine = ContextEngine(pois: _poiService.allPois);
 
     final String targetSessionId = widget.sessionId ?? 'demo-prague-naples';
-    
+
     if (targetSessionId == 'demo-prague-naples') {
       final demoService = DemoDataService(_db);
       await demoService.seedPragueToNaples();
     }
-    
+
     final points = await (_db.select(_db.trackPoints)
           ..where((t) => t.sessionId.equals(targetSessionId))
           ..orderBy([(t) => drift.OrderingTerm.asc(t.timestamp)]))
@@ -91,14 +92,15 @@ class _ReplayScreenState extends State<ReplayScreen> {
 
   void _startTimer() {
     _timer?.cancel();
-    const tickMs = 100; // Update every 100ms
+    const tickMs = 100;
+
     _timer = Timer.periodic(const Duration(milliseconds: tickMs), (timer) {
       if (_allPoints.isEmpty) return;
 
-      final totalDurationSec = _allPoints.last.timestamp.difference(_allPoints.first.timestamp).inSeconds;
-      
+      final totalDurationSec =
+          _allPoints.last.timestamp.difference(_allPoints.first.timestamp).inSeconds;
+
       setState(() {
-        // Increase virtual time based on multiplier
         _virtualTimeOffsetSec += (tickMs / 1000.0) * _speedMultiplier;
 
         if (_virtualTimeOffsetSec >= totalDurationSec) {
@@ -107,9 +109,8 @@ class _ReplayScreenState extends State<ReplayScreen> {
           _timer?.cancel();
         }
 
-        // Find closest point for this virtual time
         _currentIndex = _findClosestIndex(_virtualTimeOffsetSec);
-        
+
         final p = _allPoints[_currentIndex];
         _updateContext(LatLng(p.lat, p.lon));
       });
@@ -117,13 +118,15 @@ class _ReplayScreenState extends State<ReplayScreen> {
   }
 
   int _findClosestIndex(double offsetSec) {
+    if (_allPoints.isEmpty) return 0;
+
     final startTime = _allPoints.first.timestamp;
-    // Simple linear search or binary search could be used here. 
-    // Since points are usually ordered, we can optimize.
-    for (int i = _currentIndex; i < _allPoints.length; i++) {
+
+    for (int i = 0; i < _allPoints.length; i++) {
       final pOffset = _allPoints[i].timestamp.difference(startTime).inSeconds;
       if (pOffset >= offsetSec) return i;
     }
+
     return _allPoints.length - 1;
   }
 
@@ -139,11 +142,17 @@ class _ReplayScreenState extends State<ReplayScreen> {
 
   void _changeSpeed() {
     setState(() {
-      if (_speedMultiplier == 1.0) _speedMultiplier = 2.0;
-      else if (_speedMultiplier == 2.0) _speedMultiplier = 5.0;
-      else if (_speedMultiplier == 5.0) _speedMultiplier = 10.0;
-      else if (_speedMultiplier == 10.0) _speedMultiplier = 50.0; // Added 50x for long flights
-      else _speedMultiplier = 1.0;
+      if (_speedMultiplier == 1.0) {
+        _speedMultiplier = 2.0;
+      } else if (_speedMultiplier == 2.0) {
+        _speedMultiplier = 5.0;
+      } else if (_speedMultiplier == 5.0) {
+        _speedMultiplier = 10.0;
+      } else if (_speedMultiplier == 10.0) {
+        _speedMultiplier = 50.0;
+      } else {
+        _speedMultiplier = 1.0;
+      }
     });
   }
 
@@ -162,9 +171,13 @@ class _ReplayScreenState extends State<ReplayScreen> {
 
     final currentPoint = _allPoints[_currentIndex];
     final currentLocation = LatLng(currentPoint.lat, currentPoint.lon);
-    final track = _allPoints.take(_currentIndex + 1).map((p) => LatLng(p.lat, p.lon)).toList();
-    
-    final totalDuration = _allPoints.last.timestamp.difference(_allPoints.first.timestamp);
+    final List<LatLng> track = _allPoints
+        .take(_currentIndex + 1)
+        .map<LatLng>((p) => LatLng(p.lat, p.lon))
+        .toList();
+
+    final totalDuration =
+        _allPoints.last.timestamp.difference(_allPoints.first.timestamp);
     final currentDuration = Duration(seconds: _virtualTimeOffsetSec.toInt());
 
     return SafeArea(
@@ -183,7 +196,6 @@ class _ReplayScreenState extends State<ReplayScreen> {
               rivers: _vectorService.rivers,
             ),
           ),
-
           if (_activeContext != null)
             Positioned(
               right: 12,
@@ -193,37 +205,40 @@ class _ReplayScreenState extends State<ReplayScreen> {
                 distanceKm: _activeContext!.distanceKm,
               ),
             ),
-
-          // Top Info Bar - Added Date & Time
           Positioned(
-            top: 12, left: 12, right: 12,
+            top: 12,
+            left: 12,
+            right: 12,
             child: _ReplayTopBar(
-              title: '${_dateFormat.format(currentPoint.timestamp)} · ${_timeFormat.format(currentPoint.timestamp)}',
+              title:
+                  '${_dateFormat.format(currentPoint.timestamp)} · ${_timeFormat.format(currentPoint.timestamp)}',
               status: _isPlaying ? 'PLAY ${_speedMultiplier.toInt()}x' : 'PAUSED',
             ),
           ),
-
-          // Telemetry - Added GPS
           Positioned(
-            top: 76, left: 12,
+            top: 76,
+            left: 12,
             child: _ReplayCornerInfoBadge(
               title: 'GPS / SPD',
-              value: '${currentPoint.lat.toStringAsFixed(3)}, ${currentPoint.lon.toStringAsFixed(3)}\n${currentPoint.speedKmh.toInt()} km/h',
+              value:
+                  '${currentPoint.lat.toStringAsFixed(3)}, ${currentPoint.lon.toStringAsFixed(3)}\n${currentPoint.speedKmh.toInt()} km/h',
               alignRight: false,
             ),
           ),
           Positioned(
-            top: 76, right: 12,
+            top: 76,
+            right: 12,
             child: _ReplayCornerInfoBadge(
               title: 'ALT / TIME',
-              value: '${currentPoint.altMeters.toInt()} m\n+${_formatDuration(currentDuration)}',
+              value:
+                  '${currentPoint.altMeters.toInt()} m\n+${_formatDuration(currentDuration)}',
               alignRight: true,
             ),
           ),
-
-          // Controls
           Positioned(
-            left: 12, right: 12, bottom: 16,
+            left: 12,
+            right: 12,
+            bottom: 16,
             child: _ReplayBottomOverlay(
               scrubValue: _virtualTimeOffsetSec,
               maxScrubValue: totalDuration.inSeconds.toDouble(),
@@ -233,18 +248,25 @@ class _ReplayScreenState extends State<ReplayScreen> {
                 setState(() {
                   _virtualTimeOffsetSec = value;
                   _currentIndex = _findClosestIndex(value);
-                  _updateContext(LatLng(currentPoint.lat, currentPoint.lon));
+                  final p = _allPoints[_currentIndex];
+                  _updateContext(LatLng(p.lat, p.lon));
                 });
               },
               onPlayToggle: _togglePlay,
               onSpeedToggle: _changeSpeed,
               onSkipBack: () => setState(() {
-                _virtualTimeOffsetSec = (_virtualTimeOffsetSec - 30).clamp(0, totalDuration.inSeconds.toDouble());
+                _virtualTimeOffsetSec =
+                    (_virtualTimeOffsetSec - 30).clamp(0, totalDuration.inSeconds.toDouble());
                 _currentIndex = _findClosestIndex(_virtualTimeOffsetSec);
+                final p = _allPoints[_currentIndex];
+                _updateContext(LatLng(p.lat, p.lon));
               }),
               onSkipForward: () => setState(() {
-                _virtualTimeOffsetSec = (_virtualTimeOffsetSec + 30).clamp(0, totalDuration.inSeconds.toDouble());
+                _virtualTimeOffsetSec =
+                    (_virtualTimeOffsetSec + 30).clamp(0, totalDuration.inSeconds.toDouble());
                 _currentIndex = _findClosestIndex(_virtualTimeOffsetSec);
+                final p = _allPoints[_currentIndex];
+                _updateContext(LatLng(p.lat, p.lon));
               }),
             ),
           ),
@@ -254,14 +276,18 @@ class _ReplayScreenState extends State<ReplayScreen> {
   }
 
   String _formatDuration(Duration d) {
-    return d.toString().split('.').first.padLeft(8, "0");
+    return d.toString().split('.').first.padLeft(8, '0');
   }
 }
 
 class _ReplayTopBar extends StatelessWidget {
   final String title;
   final String status;
-  const _ReplayTopBar({required this.title, required this.status});
+
+  const _ReplayTopBar({
+    required this.title,
+    required this.status,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -273,14 +299,30 @@ class _ReplayTopBar extends StatelessWidget {
           children: [
             const Icon(Icons.history, size: 18, color: Colors.blueAccent),
             const SizedBox(width: 8),
-            Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1))),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: status.contains('PLAY') ? Colors.green.withValues(alpha: 0.3) : Colors.red.withValues(alpha: 0.3),
+                color: status.contains('PLAY')
+                    ? Colors.green.withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Text(status, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+              child: Text(
+                status,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
@@ -293,7 +335,12 @@ class _ReplayCornerInfoBadge extends StatelessWidget {
   final String title;
   final String value;
   final bool alignRight;
-  const _ReplayCornerInfoBadge({required this.title, required this.value, required this.alignRight});
+
+  const _ReplayCornerInfoBadge({
+    required this.title,
+    required this.value,
+    required this.alignRight,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -303,12 +350,25 @@ class _ReplayCornerInfoBadge extends StatelessWidget {
         constraints: const BoxConstraints(minWidth: 120),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: Column(
-          crossAxisAlignment: alignRight ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment:
+              alignRight ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(color: Colors.white54, fontSize: 9, letterSpacing: 1)),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white54,
+                fontSize: 9,
+                letterSpacing: 1,
+              ),
+            ),
             const SizedBox(height: 2),
-            Text(value, 
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, height: 1.2),
+            Text(
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                height: 1.2,
+              ),
               textAlign: alignRight ? TextAlign.right : TextAlign.left,
             ),
           ],
@@ -359,17 +419,30 @@ class _ReplayBottomOverlay extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                IconButton(onPressed: onSkipBack, icon: const Icon(Icons.replay_30)),
+                IconButton(
+                  onPressed: onSkipBack,
+                  icon: const Icon(Icons.replay_30),
+                ),
                 IconButton(
                   onPressed: onPlayToggle,
-                  icon: Icon(isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled),
+                  icon: Icon(
+                    isPlaying
+                        ? Icons.pause_circle_filled
+                        : Icons.play_circle_filled,
+                  ),
                   iconSize: 48,
                   color: Colors.white,
                 ),
-                IconButton(onPressed: onSkipForward, icon: const Icon(Icons.forward_30)),
+                IconButton(
+                  onPressed: onSkipForward,
+                  icon: const Icon(Icons.forward_30),
+                ),
                 const SizedBox(width: 10),
                 ActionChip(
-                  label: Text(speedLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  label: Text(
+                    speedLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   onPressed: onSpeedToggle,
                   backgroundColor: Colors.blueAccent.withValues(alpha: 0.2),
                 ),
