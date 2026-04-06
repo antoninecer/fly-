@@ -14,16 +14,17 @@ class AssetService {
 
     final List<String> jsonFiles = [
       'airports.json',
-      'cities.json',
-      'poi_database.json',
       'borders.json',
       'europe_rivers.json',
+      'europe_lakes.json',
+      'eu_cities_major.json',
+      'eu_cities_medium.json',
+      'eu_peaks_major.json',
     ];
 
     final docDir = await getApplicationDocumentsDirectory();
     final List<String> localMbtilesPaths = [];
 
-    // Copy MBTiles
     for (final fileName in mbtilesFiles) {
       final localPath = join(docDir.path, fileName);
       final file = File(localPath);
@@ -33,10 +34,10 @@ class AssetService {
         final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
         await file.writeAsBytes(bytes, flush: true);
       }
+
       localMbtilesPaths.add(localPath);
     }
 
-    // Copy JSONs (so services can still use File API)
     for (final fileName in jsonFiles) {
       final localPath = join(docDir.path, fileName);
       final file = File(localPath);
@@ -51,7 +52,6 @@ class AssetService {
     return localMbtilesPaths;
   }
 
-  /// Helper to get the local path of a file in the app documents directory
   static Future<String> getLocalPath(String fileName) async {
     final docDir = await getApplicationDocumentsDirectory();
     return join(docDir.path, fileName);

@@ -1,0 +1,1906 @@
+[
+  {
+    "name": "Aachen",
+    "place": "city",
+    "population": 241683,
+    "lon": 6.083862,
+    "lat": 50.776351
+  },
+  {
+    "name": "Aix-en-Provence",
+    "place": "city",
+    "population": 147478,
+    "lon": 5.4474738,
+    "lat": 43.5298424
+  },
+  {
+    "name": "Amiens",
+    "place": "city",
+    "population": 133625,
+    "lon": 2.2956951,
+    "lat": 49.8941708
+  },
+  {
+    "name": "Andria",
+    "place": "city",
+    "population": 100440,
+    "lon": 16.2954806,
+    "lat": 41.2275731
+  },
+  {
+    "name": "Angers",
+    "place": "city",
+    "population": 157175,
+    "lon": -0.5515588,
+    "lat": 47.4739884
+  },
+  {
+    "name": "Annecy",
+    "place": "city",
+    "population": 131715,
+    "lon": 6.1288847,
+    "lat": 45.8992348
+  },
+  {
+    "name": "Arad",
+    "place": "city",
+    "population": 159074,
+    "lon": 21.3196342,
+    "lat": 46.1753793
+  },
+  {
+    "name": "Argenteuil",
+    "place": "city",
+    "population": 107221,
+    "lon": 2.2481797,
+    "lat": 48.9479069
+  },
+  {
+    "name": "Augsburg",
+    "place": "city",
+    "population": 301033,
+    "lon": 10.8979522,
+    "lat": 48.3690341
+  },
+  {
+    "name": "Bacău",
+    "place": "city",
+    "population": 144307,
+    "lon": 26.9153557,
+    "lat": 46.5560493
+  },
+  {
+    "name": "Bad Bramstedt",
+    "place": "town",
+    "population": 154390,
+    "lon": 9.88333,
+    "lat": 53.9167
+  },
+  {
+    "name": "Baia Mare",
+    "place": "city",
+    "population": 123738,
+    "lon": 23.5719843,
+    "lat": 47.6565584
+  },
+  {
+    "name": "Bari",
+    "place": "city",
+    "population": 326344,
+    "lon": 16.8620293,
+    "lat": 41.1257843
+  },
+  {
+    "name": "Basel",
+    "place": "city",
+    "population": 174491,
+    "lon": 7.5878261,
+    "lat": 47.5581077
+  },
+  {
+    "name": "Bergamo",
+    "place": "city",
+    "population": 120569,
+    "lon": 9.6698727,
+    "lat": 45.6944947
+  },
+  {
+    "name": "Bergisch Gladbach",
+    "place": "city",
+    "population": 109425,
+    "lon": 7.1277379,
+    "lat": 50.9929303
+  },
+  {
+    "name": "Berlin",
+    "place": "city",
+    "population": 3769962,
+    "lon": 13.3951309,
+    "lat": 52.5173885
+  },
+  {
+    "name": "Bern",
+    "place": "city",
+    "population": 128848,
+    "lon": 7.4521749,
+    "lat": 46.9484742
+  },
+  {
+    "name": "Besançon",
+    "place": "city",
+    "population": 119198,
+    "lon": 6.0243622,
+    "lat": 47.2380222
+  },
+  {
+    "name": "Białystok",
+    "place": "city",
+    "population": 294242,
+    "lon": 23.1591679,
+    "lat": 53.132398
+  },
+  {
+    "name": "Bielefeld",
+    "place": "city",
+    "population": 328864,
+    "lon": 8.531007,
+    "lat": 52.0191005
+  },
+  {
+    "name": "Bielsko-Biała",
+    "place": "city",
+    "population": 169089,
+    "lon": 19.0448936,
+    "lat": 49.822118
+  },
+  {
+    "name": "Bochum",
+    "place": "city",
+    "population": 371075,
+    "lon": 7.2196635,
+    "lat": 51.4818111
+  },
+  {
+    "name": "Bologna",
+    "place": "city",
+    "population": 386663,
+    "lon": 11.3426327,
+    "lat": 44.4938203
+  },
+  {
+    "name": "Bolzano - Bozen",
+    "place": "city",
+    "population": 105713,
+    "lon": 11.3547399,
+    "lat": 46.4984781
+  },
+  {
+    "name": "Bonn",
+    "place": "city",
+    "population": 335913,
+    "lon": 7.1024635,
+    "lat": 50.7352621
+  },
+  {
+    "name": "Bordeaux",
+    "place": "city",
+    "population": 261804,
+    "lon": -0.5800364,
+    "lat": 44.841225
+  },
+  {
+    "name": "Botoșani",
+    "place": "city",
+    "population": 106847,
+    "lon": 26.6599858,
+    "lat": 47.7450706
+  },
+  {
+    "name": "Bottrop",
+    "place": "city",
+    "population": 116055,
+    "lon": 6.929204,
+    "lat": 51.521581
+  },
+  {
+    "name": "Boulogne-Billancourt",
+    "place": "city",
+    "population": 119808,
+    "lon": 2.240206,
+    "lat": 48.8356649
+  },
+  {
+    "name": "Bratislava",
+    "place": "city",
+    "population": 432801,
+    "lon": 17.1093063,
+    "lat": 48.1516988
+  },
+  {
+    "name": "Braunschweig",
+    "place": "city",
+    "population": 248023,
+    "lon": 10.5236066,
+    "lat": 52.2646577
+  },
+  {
+    "name": "Brașov",
+    "place": "city",
+    "population": 253200,
+    "lon": 25.6105654,
+    "lat": 45.6525105
+  },
+  {
+    "name": "Bremen",
+    "place": "city",
+    "population": 551415,
+    "lon": 8.8071646,
+    "lat": 53.0758196
+  },
+  {
+    "name": "Bremerhaven",
+    "place": "city",
+    "population": 117281,
+    "lon": 8.5851945,
+    "lat": 53.5505392
+  },
+  {
+    "name": "Brescia",
+    "place": "city",
+    "population": 187567,
+    "lon": 10.2200214,
+    "lat": 45.5398022
+  },
+  {
+    "name": "Brest",
+    "place": "city",
+    "population": 139619,
+    "lon": -4.4860088,
+    "lat": 48.3905283
+  },
+  {
+    "name": "Brno",
+    "place": "city",
+    "population": 379466,
+    "lon": 16.6113382,
+    "lat": 49.1922443
+  },
+  {
+    "name": "Brăila",
+    "place": "city",
+    "population": 180302,
+    "lon": 27.9742932,
+    "lat": 45.2716092
+  },
+  {
+    "name": "București",
+    "place": "city",
+    "population": 1883425,
+    "lon": 26.102684,
+    "lat": 44.4361414
+  },
+  {
+    "name": "Budapest",
+    "place": "city",
+    "population": 1686222,
+    "lon": 19.0402383,
+    "lat": 47.4978789
+  },
+  {
+    "name": "Buzău",
+    "place": "city",
+    "population": 115494,
+    "lon": 26.8306557,
+    "lat": 45.1490064
+  },
+  {
+    "name": "Bydgoszcz",
+    "place": "city",
+    "population": 330038,
+    "lon": 18.0002529,
+    "lat": 53.1219648
+  },
+  {
+    "name": "Bytom",
+    "place": "city",
+    "population": 153274,
+    "lon": 18.9231857,
+    "lat": 50.3470387
+  },
+  {
+    "name": "Caen",
+    "place": "city",
+    "population": 108200,
+    "lon": -0.3635615,
+    "lat": 49.1813403
+  },
+  {
+    "name": "Casteddu/Cagliari",
+    "place": "city",
+    "population": 154478,
+    "lon": 9.113311,
+    "lat": 39.2171994
+  },
+  {
+    "name": "Catania",
+    "place": "city",
+    "population": 298037,
+    "lon": 15.0873718,
+    "lat": 37.5023612
+  },
+  {
+    "name": "Chemnitz",
+    "place": "city",
+    "population": 243089,
+    "lon": 12.918914,
+    "lat": 50.8323531
+  },
+  {
+    "name": "Chorzów",
+    "place": "city",
+    "population": 104193,
+    "lon": 18.9544466,
+    "lat": 50.2978791
+  },
+  {
+    "name": "Clermont-Ferrand",
+    "place": "city",
+    "population": 147327,
+    "lon": 3.0819427,
+    "lat": 45.7774551
+  },
+  {
+    "name": "Cluj-Napoca",
+    "place": "city",
+    "population": 324576,
+    "lon": 23.5899542,
+    "lat": 46.769379
+  },
+  {
+    "name": "Constanța",
+    "place": "city",
+    "population": 283872,
+    "lon": 28.6507598,
+    "lat": 44.1767161
+  },
+  {
+    "name": "Craiova",
+    "place": "city",
+    "population": 269506,
+    "lon": 23.7965614,
+    "lat": 44.3190159
+  },
+  {
+    "name": "Częstochowa",
+    "place": "city",
+    "population": 204730,
+    "lon": 19.113213,
+    "lat": 50.8120466
+  },
+  {
+    "name": "Darmstadt",
+    "place": "city",
+    "population": 159631,
+    "lon": 8.651177,
+    "lat": 49.872775
+  },
+  {
+    "name": "Debrecen",
+    "place": "city",
+    "population": 201704,
+    "lon": 21.6259782,
+    "lat": 47.531399
+  },
+  {
+    "name": "Dijon",
+    "place": "city",
+    "population": 159346,
+    "lon": 5.0414701,
+    "lat": 47.3215806
+  },
+  {
+    "name": "Dortmund",
+    "place": "city",
+    "population": 600933,
+    "lon": 7.4652789,
+    "lat": 51.5142273
+  },
+  {
+    "name": "Dresden",
+    "place": "city",
+    "population": 572240,
+    "lon": 13.7381437,
+    "lat": 51.0493286
+  },
+  {
+    "name": "Duisburg",
+    "place": "city",
+    "population": 486855,
+    "lon": 6.759562,
+    "lat": 51.434999
+  },
+  {
+    "name": "Düsseldorf",
+    "place": "city",
+    "population": 653253,
+    "lon": 6.7763137,
+    "lat": 51.2254018
+  },
+  {
+    "name": "Dąbrowa Górnicza",
+    "place": "city",
+    "population": 116930,
+    "lon": 19.2078918,
+    "lat": 50.3308692
+  },
+  {
+    "name": "Elbląg",
+    "place": "city",
+    "population": 115220,
+    "lon": 19.4044583,
+    "lat": 54.1558708
+  },
+  {
+    "name": "Erfurt",
+    "place": "city",
+    "population": 213332,
+    "lon": 11.0287364,
+    "lat": 50.9777974
+  },
+  {
+    "name": "Erlangen",
+    "place": "city",
+    "population": 120028,
+    "lon": 11.0037372,
+    "lat": 49.5977469
+  },
+  {
+    "name": "Essen",
+    "place": "city",
+    "population": 569884,
+    "lon": 7.0158171,
+    "lat": 51.4582235
+  },
+  {
+    "name": "Ferrara",
+    "place": "city",
+    "population": 133155,
+    "lon": 11.6186451,
+    "lat": 44.8372737
+  },
+  {
+    "name": "Firenze",
+    "place": "city",
+    "population": 382808,
+    "lon": 11.2556404,
+    "lat": 43.7697955
+  },
+  {
+    "name": "Foggia",
+    "place": "city",
+    "population": 151991,
+    "lon": 15.5432595,
+    "lat": 41.4620482
+  },
+  {
+    "name": "Forlì",
+    "place": "city",
+    "population": 117913,
+    "lon": 12.041273,
+    "lat": 44.2227278
+  },
+  {
+    "name": "Frankfurt am Main",
+    "place": "city",
+    "population": 701350,
+    "lon": 8.6820917,
+    "lat": 50.1106444
+  },
+  {
+    "name": "Freiburg im Breisgau",
+    "place": "city",
+    "population": 220286,
+    "lon": 7.8494005,
+    "lat": 47.9960901
+  },
+  {
+    "name": "Fürth",
+    "place": "city",
+    "population": 135082,
+    "lon": 10.9893626,
+    "lat": 49.4772475
+  },
+  {
+    "name": "Galați",
+    "place": "city",
+    "population": 249432,
+    "lon": 28.0549395,
+    "lat": 45.4338215
+  },
+  {
+    "name": "Gdańsk",
+    "place": "city",
+    "population": 487834,
+    "lon": 18.6540233,
+    "lat": 54.3482907
+  },
+  {
+    "name": "Gdynia",
+    "place": "city",
+    "population": 245222,
+    "lon": 18.5402738,
+    "lat": 54.5164982
+  },
+  {
+    "name": "Gelsenkirchen",
+    "place": "city",
+    "population": 260368,
+    "lon": 7.0960124,
+    "lat": 51.5110321
+  },
+  {
+    "name": "Genova",
+    "place": "city",
+    "population": 586655,
+    "lon": 8.9338624,
+    "lat": 44.40726
+  },
+  {
+    "name": "Genève",
+    "place": "city",
+    "population": 191557,
+    "lon": 6.1466014,
+    "lat": 46.2017559
+  },
+  {
+    "name": "Giugliano in Campania",
+    "place": "city",
+    "population": 123998,
+    "lon": 14.2011232,
+    "lat": 40.9283217
+  },
+  {
+    "name": "Gliwice",
+    "place": "city",
+    "population": 174016,
+    "lon": 18.6657306,
+    "lat": 50.294113
+  },
+  {
+    "name": "Gorzów Wielkopolski",
+    "place": "city",
+    "population": 114567,
+    "lon": 15.2400451,
+    "lat": 52.7309926
+  },
+  {
+    "name": "Graz",
+    "place": "city",
+    "population": 331359,
+    "lon": 15.4382786,
+    "lat": 47.0708678
+  },
+  {
+    "name": "Grenoble",
+    "place": "city",
+    "population": 157477,
+    "lon": 5.7357819,
+    "lat": 45.1875602
+  },
+  {
+    "name": "Győr",
+    "place": "city",
+    "population": 130191,
+    "lon": 17.6342832,
+    "lat": 47.6835029
+  },
+  {
+    "name": "Göttingen",
+    "place": "city",
+    "population": 135887,
+    "lon": 9.9351811,
+    "lat": 51.5328328
+  },
+  {
+    "name": "Gütersloh",
+    "place": "city",
+    "population": 103603,
+    "lon": 8.3782078,
+    "lat": 51.9063997
+  },
+  {
+    "name": "Hagen",
+    "place": "city",
+    "population": 186000,
+    "lon": 7.473296,
+    "lat": 51.3582945
+  },
+  {
+    "name": "Halle (Saale)",
+    "place": "city",
+    "population": 231565,
+    "lon": 11.9712985,
+    "lat": 51.4824354
+  },
+  {
+    "name": "Hamburg",
+    "place": "city",
+    "population": 1862565,
+    "lon": 10.0013165,
+    "lat": 53.5501721
+  },
+  {
+    "name": "Hamm",
+    "place": "city",
+    "population": 176048,
+    "lon": 7.8191185,
+    "lat": 51.681281
+  },
+  {
+    "name": "Hanau",
+    "place": "city",
+    "population": 101364,
+    "lon": 8.9169797,
+    "lat": 50.132881
+  },
+  {
+    "name": "Hannover",
+    "place": "city",
+    "population": 555372,
+    "lon": 9.7385532,
+    "lat": 52.3744779
+  },
+  {
+    "name": "Heidelberg",
+    "place": "city",
+    "population": 152113,
+    "lon": 8.694724,
+    "lat": 49.4093582
+  },
+  {
+    "name": "Heilbronn",
+    "place": "city",
+    "population": 131653,
+    "lon": 9.218655,
+    "lat": 49.142291
+  },
+  {
+    "name": "Herne",
+    "place": "city",
+    "population": 156449,
+    "lon": 7.219985,
+    "lat": 51.5380394
+  },
+  {
+    "name": "III. kerület",
+    "place": "borough",
+    "population": 125147,
+    "lon": 19.0367797,
+    "lat": 47.5676107
+  },
+  {
+    "name": "Iași",
+    "place": "city",
+    "population": 290422,
+    "lon": 27.5837814,
+    "lat": 47.1615598
+  },
+  {
+    "name": "Ingolstadt",
+    "place": "city",
+    "population": 127886,
+    "lon": 11.4250395,
+    "lat": 48.7630165
+  },
+  {
+    "name": "Innsbruck",
+    "place": "city",
+    "population": 130585,
+    "lon": 11.3927685,
+    "lat": 47.2654296
+  },
+  {
+    "name": "Jena",
+    "place": "city",
+    "population": 111343,
+    "lon": 11.5879359,
+    "lat": 50.9281717
+  },
+  {
+    "name": "Karlsruhe",
+    "place": "city",
+    "population": 283959,
+    "lon": 8.4034195,
+    "lat": 49.0068705
+  },
+  {
+    "name": "Kassel",
+    "place": "city",
+    "population": 204021,
+    "lon": 9.4978479,
+    "lat": 51.3157833
+  },
+  {
+    "name": "Katowice",
+    "place": "city",
+    "population": 280190,
+    "lon": 19.0215852,
+    "lat": 50.2598987
+  },
+  {
+    "name": "Kecskemét",
+    "place": "city",
+    "population": 109450,
+    "lon": 19.6920854,
+    "lat": 46.9074763
+  },
+  {
+    "name": "Kiel",
+    "place": "city",
+    "population": 246306,
+    "lon": 10.135555,
+    "lat": 54.3227085
+  },
+  {
+    "name": "Kielce",
+    "place": "city",
+    "population": 183885,
+    "lon": 20.6310488,
+    "lat": 50.8719903
+  },
+  {
+    "name": "Klagenfurt",
+    "place": "city",
+    "population": 100316,
+    "lon": 14.3075976,
+    "lat": 46.623943
+  },
+  {
+    "name": "Koblenz",
+    "place": "city",
+    "population": 110643,
+    "lon": 7.5943951,
+    "lat": 50.3533278
+  },
+  {
+    "name": "Koszalin",
+    "place": "city",
+    "population": 105143,
+    "lon": 16.17707,
+    "lat": 54.19092
+  },
+  {
+    "name": "Košice",
+    "place": "city",
+    "population": 238593,
+    "lon": 21.2496774,
+    "lat": 48.7172272
+  },
+  {
+    "name": "Kraków",
+    "place": "city",
+    "population": 800653,
+    "lon": 19.9368564,
+    "lat": 50.0619474
+  },
+  {
+    "name": "Krefeld",
+    "place": "city",
+    "population": 222058,
+    "lon": 6.5623343,
+    "lat": 51.3331205
+  },
+  {
+    "name": "Köln",
+    "place": "city",
+    "population": 1069200,
+    "lon": 6.959974,
+    "lat": 50.938361
+  },
+  {
+    "name": "Latina",
+    "place": "city",
+    "population": 127732,
+    "lon": 12.9037518,
+    "lat": 41.467299
+  },
+  {
+    "name": "Lausanne",
+    "place": "city",
+    "population": 133521,
+    "lon": 6.6327025,
+    "lat": 46.5218269
+  },
+  {
+    "name": "Le Havre",
+    "place": "city",
+    "population": 166058,
+    "lon": 0.1079732,
+    "lat": 49.4938975
+  },
+  {
+    "name": "Le Mans",
+    "place": "city",
+    "population": 145004,
+    "lon": 0.1967849,
+    "lat": 48.0073849
+  },
+  {
+    "name": "Leipzig",
+    "place": "city",
+    "population": 628718,
+    "lon": 12.3747329,
+    "lat": 51.3406321
+  },
+  {
+    "name": "Leverkusen",
+    "place": "city",
+    "population": 160819,
+    "lon": 6.9881194,
+    "lat": 51.0324743
+  },
+  {
+    "name": "Liberec",
+    "place": "city",
+    "population": 102951,
+    "lon": 15.0583947,
+    "lat": 50.7702648
+  },
+  {
+    "name": "Lille",
+    "place": "city",
+    "population": 236710,
+    "lon": 3.0635282,
+    "lat": 50.6365654
+  },
+  {
+    "name": "Limoges",
+    "place": "city",
+    "population": 129760,
+    "lon": 1.2644847,
+    "lat": 45.8354243
+  },
+  {
+    "name": "Linz",
+    "place": "city",
+    "population": 207812,
+    "lon": 14.286198,
+    "lat": 48.3059078
+  },
+  {
+    "name": "Livorno",
+    "place": "city",
+    "population": 159219,
+    "lon": 10.3091256,
+    "lat": 43.5507317
+  },
+  {
+    "name": "Ljubljana",
+    "place": "city",
+    "population": 285604,
+    "lon": 14.5069289,
+    "lat": 46.0500268
+  },
+  {
+    "name": "Lublin",
+    "place": "city",
+    "population": 334681,
+    "lon": 22.5701022,
+    "lat": 51.250559
+  },
+  {
+    "name": "Ludwigshafen am Rhein",
+    "place": "city",
+    "population": 163340,
+    "lon": 8.4381568,
+    "lat": 49.4704113
+  },
+  {
+    "name": "Lyon",
+    "place": "city",
+    "population": 522250,
+    "lon": 4.8320114,
+    "lat": 45.7578137
+  },
+  {
+    "name": "Lübeck",
+    "place": "city",
+    "population": 212958,
+    "lon": 10.684738,
+    "lat": 53.866444
+  },
+  {
+    "name": "Magdeburg",
+    "place": "city",
+    "population": 244329,
+    "lon": 11.6400789,
+    "lat": 52.1314783
+  },
+  {
+    "name": "Mainz",
+    "place": "city",
+    "population": 227277,
+    "lon": 8.2736253,
+    "lat": 49.9995205
+  },
+  {
+    "name": "Mannheim",
+    "place": "city",
+    "population": 310000,
+    "lon": 8.4673098,
+    "lat": 49.4892913
+  },
+  {
+    "name": "Marseille",
+    "place": "city",
+    "population": 873076,
+    "lon": 5.3699525,
+    "lat": 43.2961743
+  },
+  {
+    "name": "Messina",
+    "place": "city",
+    "population": 216918,
+    "lon": 15.5542082,
+    "lat": 38.1937571
+  },
+  {
+    "name": "Metz",
+    "place": "city",
+    "population": 120874,
+    "lon": 6.1763552,
+    "lat": 49.1196964
+  },
+  {
+    "name": "Milano",
+    "place": "city",
+    "population": 1350000,
+    "lon": 9.1896346,
+    "lat": 45.4641943
+  },
+  {
+    "name": "Miskolc",
+    "place": "city",
+    "population": 143502,
+    "lon": 20.7900429,
+    "lat": 48.1030643
+  },
+  {
+    "name": "Modena",
+    "place": "city",
+    "population": 184973,
+    "lon": 10.9255707,
+    "lat": 44.6458885
+  },
+  {
+    "name": "Moers",
+    "place": "city",
+    "population": 105102,
+    "lon": 6.62843,
+    "lat": 51.451283
+  },
+  {
+    "name": "Montpellier",
+    "place": "city",
+    "population": 302454,
+    "lon": 3.8767337,
+    "lat": 43.6112422
+  },
+  {
+    "name": "Montreuil",
+    "place": "city",
+    "population": 111455,
+    "lon": 2.4412184,
+    "lat": 48.8623357
+  },
+  {
+    "name": "Monza",
+    "place": "city",
+    "population": 120204,
+    "lon": 9.2735257,
+    "lat": 45.5834418
+  },
+  {
+    "name": "Mulhouse",
+    "place": "city",
+    "population": 106341,
+    "lon": 7.3389937,
+    "lat": 47.7467233
+  },
+  {
+    "name": "Mönchengladbach",
+    "place": "city",
+    "population": 255430,
+    "lon": 6.4353792,
+    "lat": 51.1947131
+  },
+  {
+    "name": "Mülheim an der Ruhr",
+    "place": "city",
+    "population": 167108,
+    "lon": 6.8829192,
+    "lat": 51.4272925
+  },
+  {
+    "name": "München",
+    "place": "city",
+    "population": 1484226,
+    "lon": 11.5753822,
+    "lat": 48.1371079
+  },
+  {
+    "name": "Münster",
+    "place": "city",
+    "population": 314332,
+    "lon": 7.6251879,
+    "lat": 51.9625101
+  },
+  {
+    "name": "Nancy",
+    "place": "city",
+    "population": 104260,
+    "lon": 6.1834097,
+    "lat": 48.6937223
+  },
+  {
+    "name": "Nantes",
+    "place": "city",
+    "population": 323204,
+    "lon": -1.5541362,
+    "lat": 47.2186371
+  },
+  {
+    "name": "Napoli",
+    "place": "city",
+    "population": 972212,
+    "lon": 14.2487679,
+    "lat": 40.8358846
+  },
+  {
+    "name": "Neuss",
+    "place": "city",
+    "population": 159122,
+    "lon": 6.6916476,
+    "lat": 51.1981778
+  },
+  {
+    "name": "Nice",
+    "place": "city",
+    "population": 348085,
+    "lon": 7.2683912,
+    "lat": 43.7009358
+  },
+  {
+    "name": "Novara",
+    "place": "city",
+    "population": 100910,
+    "lon": 8.619655,
+    "lat": 45.4464036
+  },
+  {
+    "name": "Nyíregyháza",
+    "place": "city",
+    "population": 115359,
+    "lon": 21.7167982,
+    "lat": 47.9557802
+  },
+  {
+    "name": "Nîmes",
+    "place": "city",
+    "population": 148104,
+    "lon": 4.3600687,
+    "lat": 43.8374249
+  },
+  {
+    "name": "Nürnberg",
+    "place": "city",
+    "population": 526091,
+    "lon": 11.077298,
+    "lat": 49.453872
+  },
+  {
+    "name": "Oberhausen",
+    "place": "city",
+    "population": 209292,
+    "lon": 6.8514435,
+    "lat": 51.4696137
+  },
+  {
+    "name": "Offenbach am Main",
+    "place": "city",
+    "population": 136824,
+    "lon": 8.7610698,
+    "lat": 50.1055002
+  },
+  {
+    "name": "Oldenburg",
+    "place": "city",
+    "population": 163830,
+    "lon": 8.2146017,
+    "lat": 53.1389753
+  },
+  {
+    "name": "Olsztyn",
+    "place": "city",
+    "population": 170225,
+    "lon": 20.476507,
+    "lat": 53.7766839
+  },
+  {
+    "name": "Opole",
+    "place": "city",
+    "population": 127387,
+    "lon": 17.9236408,
+    "lat": 50.6668184
+  },
+  {
+    "name": "Oradea",
+    "place": "city",
+    "population": 196367,
+    "lon": 21.9285231,
+    "lat": 47.0549163
+  },
+  {
+    "name": "Orléans",
+    "place": "city",
+    "population": 116617,
+    "lon": 1.9086066,
+    "lat": 47.9027336
+  },
+  {
+    "name": "Osnabrück",
+    "place": "city",
+    "population": 167730,
+    "lon": 8.047635,
+    "lat": 52.2719595
+  },
+  {
+    "name": "Ostrava",
+    "place": "city",
+    "population": 279791,
+    "lon": 18.2820084,
+    "lat": 49.8349139
+  },
+  {
+    "name": "Paderborn",
+    "place": "city",
+    "population": 151633,
+    "lon": 8.752653,
+    "lat": 51.7177044
+  },
+  {
+    "name": "Padova",
+    "place": "city",
+    "population": 210401,
+    "lon": 11.8734455,
+    "lat": 45.4077172
+  },
+  {
+    "name": "Palermo",
+    "place": "city",
+    "population": 628165,
+    "lon": 13.3524434,
+    "lat": 38.1112268
+  },
+  {
+    "name": "Paris",
+    "place": "city",
+    "population": 2133111,
+    "lon": 2.3483915,
+    "lat": 48.8534951
+  },
+  {
+    "name": "Parma",
+    "place": "city",
+    "population": 202111,
+    "lon": 10.3279843,
+    "lat": 44.80153
+  },
+  {
+    "name": "Perpignan",
+    "place": "city",
+    "population": 119656,
+    "lon": 2.8953121,
+    "lat": 42.6985304
+  },
+  {
+    "name": "Pescara",
+    "place": "city",
+    "population": 116286,
+    "lon": 14.2059269,
+    "lat": 42.469613
+  },
+  {
+    "name": "Pforzheim",
+    "place": "city",
+    "population": 117754,
+    "lon": 8.7025509,
+    "lat": 48.890934
+  },
+  {
+    "name": "Piacenza",
+    "place": "city",
+    "population": 102191,
+    "lon": 9.6947461,
+    "lat": 45.0534751
+  },
+  {
+    "name": "Pitești",
+    "place": "city",
+    "population": 155383,
+    "lon": 24.8721156,
+    "lat": 44.8572882
+  },
+  {
+    "name": "Ploiești",
+    "place": "city",
+    "population": 224406,
+    "lon": 26.0236504,
+    "lat": 44.9417468
+  },
+  {
+    "name": "Plzeň",
+    "place": "city",
+    "population": 185599,
+    "lon": 13.3775249,
+    "lat": 49.7477415
+  },
+  {
+    "name": "Podgorica",
+    "place": "city",
+    "population": 150799,
+    "lon": 19.2621081,
+    "lat": 42.4415238
+  },
+  {
+    "name": "Potsdam",
+    "place": "city",
+    "population": 178089,
+    "lon": 13.0591397,
+    "lat": 52.4009309
+  },
+  {
+    "name": "Poznań",
+    "place": "city",
+    "population": 546859,
+    "lon": 16.9335199,
+    "lat": 52.4082663
+  },
+  {
+    "name": "Praha",
+    "place": "city",
+    "population": 1275406,
+    "lon": 14.4212535,
+    "lat": 50.0874654
+  },
+  {
+    "name": "Prato",
+    "place": "city",
+    "population": 191150,
+    "lon": 11.0969262,
+    "lat": 43.880598
+  },
+  {
+    "name": "Pécs",
+    "place": "city",
+    "population": 140330,
+    "lon": 18.2280317,
+    "lat": 46.0765092
+  },
+  {
+    "name": "Płock",
+    "place": "city",
+    "population": 114594,
+    "lon": 19.7008606,
+    "lat": 52.5464521
+  },
+  {
+    "name": "Radom",
+    "place": "city",
+    "population": 201601,
+    "lon": 21.1541546,
+    "lat": 51.4022557
+  },
+  {
+    "name": "Ravenna",
+    "place": "city",
+    "population": 159116,
+    "lon": 12.2017617,
+    "lat": 44.4161414
+  },
+  {
+    "name": "Recklinghausen",
+    "place": "city",
+    "population": 115320,
+    "lon": 7.1978546,
+    "lat": 51.6143815
+  },
+  {
+    "name": "Regensburg",
+    "place": "city",
+    "population": 145000,
+    "lon": 12.0974869,
+    "lat": 49.0195333
+  },
+  {
+    "name": "Reggio Calabria",
+    "place": "city",
+    "population": 183035,
+    "lon": 15.6397556,
+    "lat": 38.1035389
+  },
+  {
+    "name": "Reggio Emilia",
+    "place": "city",
+    "population": 133296,
+    "lon": 10.6304971,
+    "lat": 44.6978389
+  },
+  {
+    "name": "Reims",
+    "place": "city",
+    "population": 179380,
+    "lon": 4.031926,
+    "lat": 49.2577886
+  },
+  {
+    "name": "Remscheid",
+    "place": "city",
+    "population": 116827,
+    "lon": 7.1943544,
+    "lat": 51.1798706
+  },
+  {
+    "name": "Rennes",
+    "place": "city",
+    "population": 225081,
+    "lon": -1.6800198,
+    "lat": 48.1113387
+  },
+  {
+    "name": "Reutlingen",
+    "place": "city",
+    "population": 112099,
+    "lon": 9.2114144,
+    "lat": 48.4919508
+  },
+  {
+    "name": "Rijeka",
+    "place": "city",
+    "population": 107964,
+    "lon": 14.442208,
+    "lat": 45.3267976
+  },
+  {
+    "name": "Rimini",
+    "place": "city",
+    "population": 147750,
+    "lon": 12.5684371,
+    "lat": 44.0593886
+  },
+  {
+    "name": "Roma",
+    "place": "city",
+    "population": 2864731,
+    "lon": 12.4829321,
+    "lat": 41.8933203
+  },
+  {
+    "name": "Rostock",
+    "place": "city",
+    "population": 207830,
+    "lon": 12.1400211,
+    "lat": 54.0886707
+  },
+  {
+    "name": "Rouen",
+    "place": "city",
+    "population": 114083,
+    "lon": 1.0939658,
+    "lat": 49.4404591
+  },
+  {
+    "name": "Ruda Śląska",
+    "place": "city",
+    "population": 129531,
+    "lon": 18.8747933,
+    "lat": 50.2858001
+  },
+  {
+    "name": "Rybnik",
+    "place": "city",
+    "population": 133772,
+    "lon": 18.5419933,
+    "lat": 50.0955793
+  },
+  {
+    "name": "Rzeszów",
+    "place": "city",
+    "population": 195871,
+    "lon": 22.0047174,
+    "lat": 50.0374531
+  },
+  {
+    "name": "Saarbrücken",
+    "place": "city",
+    "population": 177201,
+    "lon": 6.996379,
+    "lat": 49.234362
+  },
+  {
+    "name": "Saint-Denis",
+    "place": "city",
+    "population": 113942,
+    "lon": 2.3580232,
+    "lat": 48.935773
+  },
+  {
+    "name": "Saint-Étienne",
+    "place": "city",
+    "population": 172718,
+    "lon": 4.3873058,
+    "lat": 45.4401467
+  },
+  {
+    "name": "Salerno",
+    "place": "city",
+    "population": 150188,
+    "lon": 14.7594542,
+    "lat": 40.6803601
+  },
+  {
+    "name": "Salzburg",
+    "place": "city",
+    "population": 152083,
+    "lon": 13.0464806,
+    "lat": 47.7981346
+  },
+  {
+    "name": "Salzgitter",
+    "place": "city",
+    "population": 103694,
+    "lon": 10.3593147,
+    "lat": 52.1503721
+  },
+  {
+    "name": "Satu Mare",
+    "place": "city",
+    "population": 102411,
+    "lon": 22.8725598,
+    "lat": 47.7891763
+  },
+  {
+    "name": "Sibiu",
+    "place": "city",
+    "population": 147245,
+    "lon": 24.1519202,
+    "lat": 45.7973912
+  },
+  {
+    "name": "Siracusa",
+    "place": "city",
+    "population": 115923,
+    "lon": 15.2907196,
+    "lat": 37.0646139
+  },
+  {
+    "name": "Solingen",
+    "place": "city",
+    "population": 164205,
+    "lon": 7.0845893,
+    "lat": 51.1721629
+  },
+  {
+    "name": "Sosnowiec",
+    "place": "city",
+    "population": 193660,
+    "lon": 19.1342944,
+    "lat": 50.2780834
+  },
+  {
+    "name": "Split",
+    "place": "city",
+    "population": 149830,
+    "lon": 16.4399659,
+    "lat": 43.5116383
+  },
+  {
+    "name": "Strasbourg",
+    "place": "city",
+    "population": 291313,
+    "lon": 7.7507127,
+    "lat": 48.584614
+  },
+  {
+    "name": "Stuttgart",
+    "place": "city",
+    "population": 613392,
+    "lon": 9.1800132,
+    "lat": 48.7784485
+  },
+  {
+    "name": "Szczecin",
+    "place": "city",
+    "population": 387700,
+    "lon": 14.5509623,
+    "lat": 53.4301818
+  },
+  {
+    "name": "Szeged",
+    "place": "city",
+    "population": 157930,
+    "lon": 20.1486016,
+    "lat": 46.2546312
+  },
+  {
+    "name": "Taranto",
+    "place": "city",
+    "population": 201100,
+    "lon": 17.2432278,
+    "lat": 40.4712427
+  },
+  {
+    "name": "Tarnów",
+    "place": "city",
+    "population": 106259,
+    "lon": 20.9880739,
+    "lat": 50.0123784
+  },
+  {
+    "name": "Timișoara",
+    "place": "city",
+    "population": 319279,
+    "lon": 21.2257474,
+    "lat": 45.7538355
+  },
+  {
+    "name": "Torino",
+    "place": "city",
+    "population": 856745,
+    "lon": 7.6824892,
+    "lat": 45.0677551
+  },
+  {
+    "name": "Toruń",
+    "place": "city",
+    "population": 198273,
+    "lon": 18.6048094,
+    "lat": 53.0102721
+  },
+  {
+    "name": "Toulon",
+    "place": "city",
+    "population": 180452,
+    "lon": 5.9304919,
+    "lat": 43.1257311
+  },
+  {
+    "name": "Toulouse",
+    "place": "city",
+    "population": 504078,
+    "lon": 1.4442433,
+    "lat": 43.6044638
+  },
+  {
+    "name": "Tours",
+    "place": "city",
+    "population": 137658,
+    "lon": 0.6889268,
+    "lat": 47.3900474
+  },
+  {
+    "name": "Trento",
+    "place": "city",
+    "population": 117317,
+    "lon": 11.1257601,
+    "lat": 46.0664228
+  },
+  {
+    "name": "Trier",
+    "place": "city",
+    "population": 107233,
+    "lon": 6.6441878,
+    "lat": 49.7596208
+  },
+  {
+    "name": "Trieste",
+    "place": "city",
+    "population": 184033,
+    "lon": 13.7772781,
+    "lat": 45.6496485
+  },
+  {
+    "name": "Tychy",
+    "place": "city",
+    "population": 124882,
+    "lon": 18.9965933,
+    "lat": 50.114397
+  },
+  {
+    "name": "Tàttari/Sassari",
+    "place": "city",
+    "population": 126576,
+    "lon": 8.5612674,
+    "lat": 40.7234746
+  },
+  {
+    "name": "Târgu Mureș",
+    "place": "city",
+    "population": 134290,
+    "lon": 24.561196,
+    "lat": 46.5446253
+  },
+  {
+    "name": "Ulm",
+    "place": "city",
+    "population": 121648,
+    "lon": 9.9912458,
+    "lat": 48.3984968
+  },
+  {
+    "name": "Verona",
+    "place": "city",
+    "population": 259966,
+    "lon": 10.9924122,
+    "lat": 45.4384958
+  },
+  {
+    "name": "Vicenza",
+    "place": "city",
+    "population": 112953,
+    "lon": 11.5478825,
+    "lat": 45.5488306
+  },
+  {
+    "name": "Villeurbanne",
+    "place": "city",
+    "population": 156928,
+    "lon": 4.8868454,
+    "lat": 45.7733573
+  },
+  {
+    "name": "Warszawa",
+    "place": "city",
+    "population": 1863845,
+    "lon": 21.0067249,
+    "lat": 52.2319581
+  },
+  {
+    "name": "Wałbrzych",
+    "place": "city",
+    "population": 104401,
+    "lon": 16.2825424,
+    "lat": 50.7659054
+  },
+  {
+    "name": "Wien",
+    "place": "city",
+    "population": 1920949,
+    "lon": 16.3725042,
+    "lat": 48.2083537
+  },
+  {
+    "name": "Wiesbaden",
+    "place": "city",
+    "population": 299946,
+    "lon": 8.2416556,
+    "lat": 50.0820384
+  },
+  {
+    "name": "Winterthur",
+    "place": "city",
+    "population": 108044,
+    "lon": 8.7291498,
+    "lat": 47.4991723
+  },
+  {
+    "name": "Wolfsburg",
+    "place": "city",
+    "population": 122457,
+    "lon": 10.7861682,
+    "lat": 52.4205588
+  },
+  {
+    "name": "Wrocław",
+    "place": "city",
+    "population": 893506,
+    "lon": 17.0326689,
+    "lat": 51.1089776
+  },
+  {
+    "name": "Wuppertal",
+    "place": "city",
+    "population": 361077,
+    "lon": 7.1780374,
+    "lat": 51.264018
+  },
+  {
+    "name": "Würzburg",
+    "place": "city",
+    "population": 124700,
+    "lon": 9.9309779,
+    "lat": 49.7933723
+  },
+  {
+    "name": "Włocławek",
+    "place": "city",
+    "population": 104705,
+    "lon": 19.071948,
+    "lat": 52.6603872
+  },
+  {
+    "name": "XI. kerület",
+    "place": "borough",
+    "population": 149126,
+    "lon": 19.0274649,
+    "lat": 47.4670427
+  },
+  {
+    "name": "XIII. kerület",
+    "place": "borough",
+    "population": 120573,
+    "lon": 19.0706155,
+    "lat": 47.5334981
+  },
+  {
+    "name": "XIV. kerület",
+    "place": "borough",
+    "population": 118759,
+    "lon": 19.1138572,
+    "lat": 47.5181354
+  },
+  {
+    "name": "Zabrze",
+    "place": "city",
+    "population": 158307,
+    "lon": 18.7863749,
+    "lat": 50.3086154
+  },
+  {
+    "name": "Zagreb",
+    "place": "city",
+    "population": 663592,
+    "lon": 15.9772795,
+    "lat": 45.8130967
+  },
+  {
+    "name": "Zielona Góra",
+    "place": "city",
+    "population": 140002,
+    "lon": 15.5050408,
+    "lat": 51.9383777
+  },
+  {
+    "name": "Zürich",
+    "place": "city",
+    "population": 443037,
+    "lon": 8.5410422,
+    "lat": 47.3744489
+  },
+  {
+    "name": "Łódź",
+    "place": "city",
+    "population": 670642,
+    "lon": 19.4569911,
+    "lat": 51.7687323
+  },
+  {
+    "name": "Београд",
+    "place": "city",
+    "population": 1197714,
+    "lon": 20.4568974,
+    "lat": 44.8178131
+  },
+  {
+    "name": "Бургас",
+    "place": "city",
+    "population": 189741,
+    "lon": 27.4721276,
+    "lat": 42.4936616
+  },
+  {
+    "name": "Варна",
+    "place": "city",
+    "population": 348058,
+    "lon": 27.9166653,
+    "lat": 43.2073873
+  },
+  {
+    "name": "Вождовац",
+    "place": "suburb",
+    "population": 155909,
+    "lon": 20.4734682,
+    "lat": 44.7779408
+  },
+  {
+    "name": "Земун",
+    "place": "suburb",
+    "population": 166049,
+    "lon": 20.4123996,
+    "lat": 44.8444
+  },
+  {
+    "name": "Крагујевац",
+    "place": "city",
+    "population": 146315,
+    "lon": 20.9196353,
+    "lat": 44.0131786
+  },
+  {
+    "name": "Ниш",
+    "place": "city",
+    "population": 178976,
+    "lon": 21.8959232,
+    "lat": 43.3211301
+  },
+  {
+    "name": "Нови Београд",
+    "place": "suburb",
+    "population": 209763,
+    "lon": 20.4183382,
+    "lat": 44.8133048
+  },
+  {
+    "name": "Нови Сад",
+    "place": "city",
+    "population": 260438,
+    "lon": 19.8451756,
+    "lat": 45.2551338
+  },
+  {
+    "name": "Палилула",
+    "place": "suburb",
+    "population": 113883,
+    "lon": 20.4782946,
+    "lat": 44.8115007
+  },
+  {
+    "name": "Плевен",
+    "place": "city",
+    "population": 111567,
+    "lon": 24.6180123,
+    "lat": 43.409022
+  },
+  {
+    "name": "Пловдив",
+    "place": "city",
+    "population": 368983,
+    "lon": 24.7499297,
+    "lat": 42.1418541
+  },
+  {
+    "name": "Раковица",
+    "place": "suburb",
+    "population": 104456,
+    "lon": 20.4403105,
+    "lat": 44.7463363
+  },
+  {
+    "name": "Русе",
+    "place": "city",
+    "population": 159798,
+    "lon": 25.9542057,
+    "lat": 43.8480413
+  },
+  {
+    "name": "София",
+    "place": "city",
+    "population": 1286383,
+    "lon": 23.3217359,
+    "lat": 42.6977028
+  },
+  {
+    "name": "Стара Загора",
+    "place": "city",
+    "population": 149266,
+    "lon": 25.6257479,
+    "lat": 42.4248111
+  },
+  {
+    "name": "Чукарица",
+    "place": "suburb",
+    "population": 138187,
+    "lon": 20.4154022,
+    "lat": 44.7716947
+  }
+]

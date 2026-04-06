@@ -87,12 +87,14 @@ flutter:
     - data/maps/source/world_base_z4_z5.mbtiles
     - data/maps/source/europe_detail_z6_z7.mbtiles
     - data/source/airports.json
-    - data/source/cities.json
-    - data/source/poi_database.json
     - data/source/borders.json
     - data/source/europe_rivers.json
+    - data/source/europe_lakes.json
+    - data/source/eu_cities_major.json
+    - data/source/eu_cities_medium.json
+    - data/source/eu_peaks_major.json
     - assets/icons/map_placeholder.png
-
+  
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
