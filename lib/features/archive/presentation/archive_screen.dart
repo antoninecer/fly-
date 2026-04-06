@@ -5,7 +5,9 @@ import '../../../data/repositories/session_repository.dart';
 import '../../replay/presentation/replay_screen.dart';
 
 class ArchiveScreen extends StatefulWidget {
-  const ArchiveScreen({super.key});
+  final ValueChanged<String>? onPlaySession;
+
+  const ArchiveScreen({super.key, this.onPlaySession});
 
   @override
   State<ArchiveScreen> createState() => _ArchiveScreenState();
@@ -30,6 +32,11 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   }
 
   void _playSession(String sessionId) {
+    if (widget.onPlaySession != null) {
+      widget.onPlaySession!(sessionId);
+      return;
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ReplayScreen(sessionId: sessionId),
@@ -44,7 +51,10 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
         title: const Text('Delete Session?'),
         content: Text('Are you sure you want to delete "${session.title}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -80,12 +90,15 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  
+
                   final sessions = snapshot.data ?? [];
-                  
+
                   if (sessions.isEmpty) {
                     return const Center(
-                      child: Text('No sessions found in archive.', style: TextStyle(color: Colors.white54)),
+                      child: Text(
+                        'No sessions found in archive.',
+                        style: TextStyle(color: Colors.white54),
+                      ),
                     );
                   }
 
@@ -166,7 +179,9 @@ class _ArchiveItemCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  session.type == 'flight' ? Icons.flight_takeoff : Icons.gps_fixed,
+                  session.type == 'flight'
+                      ? Icons.flight_takeoff
+                      : Icons.gps_fixed,
                   color: Colors.blueAccent,
                   size: 20,
                 ),
@@ -174,17 +189,24 @@ class _ArchiveItemCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     session.title,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 if (isDemo)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.amber.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text('DEMO', style: TextStyle(fontSize: 10, color: Colors.amber)),
+                    child: const Text(
+                      'DEMO',
+                      style: TextStyle(fontSize: 10, color: Colors.amber),
+                    ),
                   ),
               ],
             ),
@@ -196,13 +218,20 @@ class _ArchiveItemCard extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 12, color: Colors.white54),
+                const Icon(Icons.calendar_today,
+                    size: 12, color: Colors.white54),
                 const SizedBox(width: 4),
-                Text(dateLabel, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                Text(
+                  dateLabel,
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                ),
                 const SizedBox(width: 16),
                 const Icon(Icons.timer, size: 12, color: Colors.white54),
                 const SizedBox(width: 4),
-                Text(_formatDuration(session.durationSec), style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                Text(
+                  _formatDuration(session.durationSec),
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -218,7 +247,9 @@ class _ArchiveItemCard extends StatelessWidget {
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline, size: 18),
                   label: const Text('Delete'),
-                  style: OutlinedButton.styleFrom(foregroundColor: Colors.redAccent),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.redAccent,
+                  ),
                 ),
               ],
             ),

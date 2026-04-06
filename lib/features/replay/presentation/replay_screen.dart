@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:intl/intl.dart';
 import '../../../data/db/app_database.dart';
+import '../../../data/models/poi.dart';
 import '../../../data/services/demo_data_service.dart';
 import '../../../data/services/poi_service.dart';
 import '../../../data/services/context_engine.dart';
@@ -39,8 +40,11 @@ class _ReplayScreenState extends State<ReplayScreen> {
   List<String> _mbtilesPaths = [];
   bool _initialized = false;
 
+  Poi? _selectedPoi;
+
   final DateFormat _timeFormat = DateFormat('HH:mm:ss');
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
+  final Distance _distance = const Distance();
 
   @override
   void initState() {
@@ -50,6 +54,22 @@ class _ReplayScreenState extends State<ReplayScreen> {
     _vectorService = VectorDataService();
     _assetService = AssetService();
     _initData();
+  }
+
+  @override
+  void didUpdateWidget(covariant ReplayScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.sessionId != widget.sessionId) {
+      _timer?.cancel();
+      _allPoints = [];
+      _currentIndex = 0;
+      _virtualTimeOffsetSec = 0;
+      _isPlaying = false;
+      _selectedPoi = null;
+      _activeContext = null;
+      _initialized = false;
+      _initData();
+    }
   }
 
   Future<void> _initData() async {
@@ -70,12 +90,16 @@ class _ReplayScreenState extends State<ReplayScreen> {
           ..orderBy([(t) => drift.OrderingTerm.asc(t.timestamp)]))
         .get();
 
-    if (mounted) {
-      setState(() {
-        _mbtilesPaths = paths;
-        _allPoints = points;
-        _initialized = true;
-      });
+    if (!mounted) return;
+
+    setState(() {
+      _mbtilesPaths = paths;
+      _allPoints = points;
+      _initialized = true;
+    });
+
+    if (points.isNotEmpty) {
+      _updateContext(LatLng(points.first.lat, points.first.lon));
     }
   }
 
@@ -97,8 +121,9 @@ class _ReplayScreenState extends State<ReplayScreen> {
     _timer = Timer.periodic(const Duration(milliseconds: tickMs), (timer) {
       if (_allPoints.isEmpty) return;
 
-      final totalDurationSec =
-          _allPoints.last.timestamp.difference(_allPoints.first.timestamp).inSeconds;
+      final totalDurationSec = _allPoints.last.timestamp
+          .difference(_allPoints.first.timestamp)
+          .inSeconds;
 
       setState(() {
         _virtualTimeOffsetSec += (tickMs / 1000.0) * _speedMultiplier;
@@ -156,6 +181,30 @@ class _ReplayScreenState extends State<ReplayScreen> {
     });
   }
 
+  void _handlePoiSelected(Poi? poi) {
+    if (!mounted) return;
+    setState(() {
+      _selectedPoi = poi;
+    });
+  }
+
+  double _selectedPoiDistanceKm(LatLng currentLocation) {
+    final poi = _selectedPoi;
+    if (poi == null) return 0.0;
+    return _distance.as(LengthUnit.Kilometer, currentLocation, poi.location);
+  }
+
+  Poi? _displayedPoi() {
+    return _selectedPoi ?? _activeContext?.poi;
+  }
+
+  double _displayedDistanceKm(LatLng currentLocation) {
+    if (_selectedPoi != null) {
+      return _selectedPoiDistanceKm(currentLocation);
+    }
+    return _activeContext?.distanceKm ?? 0.0;
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -180,6 +229,9 @@ class _ReplayScreenState extends State<ReplayScreen> {
         _allPoints.last.timestamp.difference(_allPoints.first.timestamp);
     final currentDuration = Duration(seconds: _virtualTimeOffsetSec.toInt());
 
+    final displayedPoi = _displayedPoi();
+    final displayedDistanceKm = _displayedDistanceKm(currentLocation);
+
     return SafeArea(
       child: Stack(
         children: [
@@ -194,15 +246,25 @@ class _ReplayScreenState extends State<ReplayScreen> {
               pois: _poiService.allPois,
               borders: _vectorService.borders,
               rivers: _vectorService.rivers,
+              onPoiSelected: _handlePoiSelected,
             ),
           ),
-          if (_activeContext != null)
+          if (displayedPoi != null)
             Positioned(
               right: 12,
               bottom: 160,
-              child: UnderflightInfoCard(
-                poi: _activeContext!.poi,
-                distanceKm: _activeContext!.distanceKm,
+              child: GestureDetector(
+                onTap: () {
+                  if (_selectedPoi != null) {
+                    setState(() {
+                      _selectedPoi = null;
+                    });
+                  }
+                },
+                child: UnderflightInfoCard(
+                  poi: displayedPoi,
+                  distanceKm: displayedDistanceKm,
+                ),
               ),
             ),
           Positioned(
@@ -212,7 +274,8 @@ class _ReplayScreenState extends State<ReplayScreen> {
             child: _ReplayTopBar(
               title:
                   '${_dateFormat.format(currentPoint.timestamp)} · ${_timeFormat.format(currentPoint.timestamp)}',
-              status: _isPlaying ? 'PLAY ${_speedMultiplier.toInt()}x' : 'PAUSED',
+              status:
+                  _isPlaying ? 'PLAY ${_speedMultiplier.toInt()}x' : 'PAUSED',
             ),
           ),
           Positioned(
@@ -255,15 +318,15 @@ class _ReplayScreenState extends State<ReplayScreen> {
               onPlayToggle: _togglePlay,
               onSpeedToggle: _changeSpeed,
               onSkipBack: () => setState(() {
-                _virtualTimeOffsetSec =
-                    (_virtualTimeOffsetSec - 30).clamp(0, totalDuration.inSeconds.toDouble());
+                _virtualTimeOffsetSec = (_virtualTimeOffsetSec - 30)
+                    .clamp(0, totalDuration.inSeconds.toDouble());
                 _currentIndex = _findClosestIndex(_virtualTimeOffsetSec);
                 final p = _allPoints[_currentIndex];
                 _updateContext(LatLng(p.lat, p.lon));
               }),
               onSkipForward: () => setState(() {
-                _virtualTimeOffsetSec =
-                    (_virtualTimeOffsetSec + 30).clamp(0, totalDuration.inSeconds.toDouble());
+                _virtualTimeOffsetSec = (_virtualTimeOffsetSec + 30)
+                    .clamp(0, totalDuration.inSeconds.toDouble());
                 _currentIndex = _findClosestIndex(_virtualTimeOffsetSec);
                 final p = _allPoints[_currentIndex];
                 _updateContext(LatLng(p.lat, p.lon));
@@ -306,6 +369,7 @@ class _ReplayTopBar extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             Container(

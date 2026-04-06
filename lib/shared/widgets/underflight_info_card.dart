@@ -14,7 +14,7 @@ class UnderflightInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 260,
+      width: 280,
       margin: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.85),
@@ -30,7 +30,6 @@ class UnderflightInfoCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with Icon and Title
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               color: _getPoiColor(poi.type).withValues(alpha: 0.3),
@@ -52,21 +51,29 @@ class UnderflightInfoCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Body with Details
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (poi.country != null && poi.country!.trim().isNotEmpty)
+                    _detailRow(Icons.flag, 'Stát: ${poi.country!}'),
                   if (poi.altitude != null)
-                    _detailRow(Icons.height, 'Výška: ${poi.altitude!.toInt()} m'),
+                    _detailRow(Icons.height, 'Výška: ${_formatDecimal1(poi.altitude!)} m'),
                   if (poi.population != null)
                     _detailRow(Icons.people, 'Populace: ${poi.population}'),
                   if (poi.extra != null && poi.type == PoiType.river)
                     _detailRow(Icons.straighten, 'Délka: ${poi.extra}'),
                   if (poi.extra != null && poi.type == PoiType.airport)
                     _detailRow(Icons.local_airport, 'IATA: ${poi.extra}'),
-                  _detailRow(Icons.near_me, 'Vzdálenost: ${distanceKm.toStringAsFixed(1)} km'),
+                  _detailRow(
+                    Icons.near_me,
+                    'Vzdálenost: ${_formatDecimal1(distanceKm)} km',
+                  ),
+                  _detailRow(
+                    Icons.place,
+                    'GPS: ${_formatCoordinate(poi.location.latitude)}, ${_formatCoordinate(poi.location.longitude)}',
+                  ),
                   if (poi.info != null) ...[
                     const SizedBox(height: 8),
                     Text(
@@ -85,6 +92,14 @@ class UnderflightInfoCard extends StatelessWidget {
     );
   }
 
+  String _formatDecimal1(double value) {
+    return value.toStringAsFixed(1).replaceAll('.', ',');
+  }
+
+  String _formatCoordinate(double value) {
+    return value.toStringAsFixed(4).replaceAll('.', ',');
+  }
+
   Widget _detailRow(IconData icon, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
@@ -92,7 +107,12 @@ class UnderflightInfoCard extends StatelessWidget {
         children: [
           Icon(icon, size: 12, color: Colors.white60),
           const SizedBox(width: 6),
-          Text(text, style: const TextStyle(color: Colors.white, fontSize: 11)),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(color: Colors.white, fontSize: 11),
+            ),
+          ),
         ],
       ),
     );
@@ -100,19 +120,27 @@ class UnderflightInfoCard extends StatelessWidget {
 
   IconData _getPoiIcon(PoiType type) {
     switch (type) {
-      case PoiType.city: return Icons.location_city;
-      case PoiType.mountain: return Icons.landscape;
-      case PoiType.river: return Icons.waves;
-      case PoiType.airport: return Icons.local_airport;
+      case PoiType.city:
+        return Icons.location_city;
+      case PoiType.mountain:
+        return Icons.landscape;
+      case PoiType.river:
+        return Icons.waves;
+      case PoiType.airport:
+        return Icons.local_airport;
     }
   }
 
   Color _getPoiColor(PoiType type) {
     switch (type) {
-      case PoiType.city: return Colors.amber;
-      case PoiType.mountain: return Colors.brown;
-      case PoiType.river: return Colors.blue;
-      case PoiType.airport: return Colors.green;
+      case PoiType.city:
+        return Colors.amber;
+      case PoiType.mountain:
+        return Colors.brown;
+      case PoiType.river:
+        return Colors.blue;
+      case PoiType.airport:
+        return Colors.green;
     }
   }
 }

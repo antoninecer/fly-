@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../sources/mbtiles_tile_provider.dart';
@@ -16,6 +17,7 @@ class LiveMap extends StatefulWidget {
   final List<Polyline> rivers;
   final bool autoCenter;
   final List<Polygon> lakes;
+  final ValueChanged<Poi?>? onPoiSelected;
 
   const LiveMap({
     super.key,
@@ -30,6 +32,7 @@ class LiveMap extends StatefulWidget {
     this.rivers = const [],
     this.lakes = const [],
     this.autoCenter = true,
+    this.onPoiSelected,
   });
 
   @override
@@ -39,6 +42,8 @@ class LiveMap extends StatefulWidget {
 class _LiveMapState extends State<LiveMap> {
   late final MbTilesTileProvider _tileProvider;
   late final MapController _mapController;
+
+  static const Distance _distance = Distance();
 
   double _currentZoom = 5;
 
@@ -50,6 +55,7 @@ class _LiveMapState extends State<LiveMap> {
   bool _showPois = true;
 
   int _layerMode = 0;
+  Poi? _selectedPoi;
 
   @override
   void initState() {
@@ -73,6 +79,11 @@ class _LiveMapState extends State<LiveMap> {
         _pendingCenter = widget.currentLocation!;
       }
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _syncSelectedPoiVisibility();
+    });
   }
 
   @override
@@ -163,6 +174,8 @@ class _LiveMapState extends State<LiveMap> {
         _applyZoomPreset(_currentZoom);
       }
     });
+
+    _scheduleSelectedPoiVisibilitySync();
   }
 
   void _zoomOut() {
@@ -177,6 +190,8 @@ class _LiveMapState extends State<LiveMap> {
         _applyZoomPreset(_currentZoom);
       }
     });
+
+    _scheduleSelectedPoiVisibilitySync();
   }
 
   LatLngBounds? _expandedBoundsOrNull() {
@@ -199,6 +214,21 @@ class _LiveMapState extends State<LiveMap> {
     );
   }
 
+  LatLngBounds? _visibleBoundsOrNull() {
+    if (!_mapReady) return null;
+    return _mapController.camera.visibleBounds;
+  }
+
+  LatLng _referencePoint() {
+    if (widget.currentLocation != null) {
+      return widget.currentLocation!;
+    }
+    if (_mapReady) {
+      return _mapController.camera.center;
+    }
+    return widget.initialCenter;
+  }
+
   bool _isPointVisible(LatLng point, LatLngBounds bounds) {
     final lat = point.latitude;
     final lon = point.longitude;
@@ -211,15 +241,87 @@ class _LiveMapState extends State<LiveMap> {
     return inLat && inLon;
   }
 
-int _peakMinAltitude() {
-  if (_currentZoom >= 10) return 1400;
-  if (_currentZoom >= 9.5) return 1600;
-  if (_currentZoom >= 9) return 1800;
-  if (_currentZoom >= 8) return 2100;
-  if (_currentZoom >= 7) return 2400;
-  if (_currentZoom >= 6) return 2800;
-  return 3400;
-}
+  bool _samePoi(Poi a, Poi b) {
+    return a.type == b.type &&
+        a.name == b.name &&
+        a.location.latitude == b.location.latitude &&
+        a.location.longitude == b.location.longitude;
+  }
+
+  bool _isSelectedPoi(Poi poi) {
+    final selected = _selectedPoi;
+    if (selected == null) return false;
+    return _samePoi(selected, poi);
+  }
+
+  void _notifyPoiSelectedSafely(Poi? poi) {
+    final callback = widget.onPoiSelected;
+    if (callback == null) return;
+
+    final phase = SchedulerBinding.instance.schedulerPhase;
+    if (phase == SchedulerPhase.idle ||
+        phase == SchedulerPhase.postFrameCallbacks) {
+      callback(poi);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        callback(poi);
+      });
+    }
+  }
+
+  void _selectPoi(Poi poi) {
+    if (_selectedPoi != null && _samePoi(_selectedPoi!, poi)) {
+      return;
+    }
+
+    setState(() {
+      _selectedPoi = poi;
+    });
+
+    _notifyPoiSelectedSafely(poi);
+  }
+
+  void _clearSelectedPoi({bool notify = true}) {
+    if (_selectedPoi == null) return;
+
+    setState(() {
+      _selectedPoi = null;
+    });
+
+    if (notify) {
+      _notifyPoiSelectedSafely(null);
+    }
+  }
+
+  void _syncSelectedPoiVisibility() {
+    final selected = _selectedPoi;
+    if (selected == null) return;
+
+    final bounds = _visibleBoundsOrNull();
+    if (bounds == null) return;
+
+    if (!_isPointVisible(selected.location, bounds)) {
+      _clearSelectedPoi();
+    }
+  }
+
+  void _scheduleSelectedPoiVisibilitySync() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _syncSelectedPoiVisibility();
+    });
+  }
+
+  int _peakMinAltitude() {
+    if (_currentZoom >= 10) return 1400;
+    if (_currentZoom >= 9.5) return 1600;
+    if (_currentZoom >= 9) return 1800;
+    if (_currentZoom >= 8) return 2100;
+    if (_currentZoom >= 7) return 2400;
+    if (_currentZoom >= 6) return 2800;
+    return 3400;
+  }
 
   int _cityMinPopulation() {
     if (_currentZoom >= 10) return 10000;
@@ -232,19 +334,21 @@ int _peakMinAltitude() {
   }
 
   List<Poi> _reducePeaksByGrid(List<Poi> peaks) {
-    if (_currentZoom >= 9.5) return peaks;
-
     final Map<String, Poi> bestPerCell = {};
 
-    final double cellSize = _currentZoom >= 9
-        ? 0.22
-        : _currentZoom >= 8
-            ? 0.35
-            : _currentZoom >= 7
-                ? 0.60
-                : _currentZoom >= 6
-                    ? 1.0
-                    : 1.8;
+    final double cellSize = _currentZoom >= 10
+        ? 0.14
+        : _currentZoom >= 9.5
+            ? 0.18
+            : _currentZoom >= 9
+                ? 0.24
+                : _currentZoom >= 8
+                    ? 0.38
+                    : _currentZoom >= 7
+                        ? 0.65
+                        : _currentZoom >= 6
+                            ? 1.1
+                            : 1.8;
 
     for (final peak in peaks) {
       final latCell = (peak.location.latitude / cellSize).floor();
@@ -321,8 +425,52 @@ int _peakMinAltitude() {
     return _reduceCitiesByGrid(cities);
   }
 
-  bool _showPeakLabels() => _currentZoom >= 7.8;
-  bool _showPeakAltitude() => _currentZoom >= 8.8;
+  List<Poi> get _visibleSelectablePois {
+    final list = <Poi>[
+      ..._visibleCities,
+      ..._visiblePeaks,
+    ];
+
+    final ref = _referencePoint();
+
+    list.sort((a, b) {
+      final da = _distance.as(LengthUnit.Kilometer, ref, a.location);
+      final db = _distance.as(LengthUnit.Kilometer, ref, b.location);
+      final cmp = da.compareTo(db);
+      if (cmp != 0) return cmp;
+      return a.name.compareTo(b.name);
+    });
+
+    return list;
+  }
+
+  void _selectRelativePoi(int delta) {
+    final pois = _visibleSelectablePois;
+    if (pois.isEmpty) return;
+
+    if (_selectedPoi == null) {
+      _selectPoi(pois.first);
+      return;
+    }
+
+    var index = pois.indexWhere((p) => _samePoi(p, _selectedPoi!));
+    if (index == -1) {
+      _selectPoi(pois.first);
+      return;
+    }
+
+    index = (index + delta) % pois.length;
+    if (index < 0) {
+      index += pois.length;
+    }
+
+    _selectPoi(pois[index]);
+  }
+
+  bool get _hasPrevNextPoiControls => _visibleSelectablePois.length > 1;
+
+  bool _showPeakLabels() => _currentZoom >= 8.8;
+  bool _showPeakAltitude() => _currentZoom >= 9.6;
   bool _showCityLabels() => _currentZoom >= 7.4;
 
   @override
@@ -336,6 +484,9 @@ int _peakMinAltitude() {
             initialZoom: widget.initialZoom,
             minZoom: 4,
             maxZoom: 10,
+            onTap: (_, __) {
+              _clearSelectedPoi();
+            },
             onMapReady: () {
               _mapReady = true;
 
@@ -343,6 +494,8 @@ int _peakMinAltitude() {
                 _mapController.move(_pendingCenter!, _currentZoom);
                 _pendingCenter = null;
               }
+
+              _scheduleSelectedPoiVisibilitySync();
             },
             onPositionChanged: (camera, hasGesture) {
               if (!mounted) return;
@@ -352,6 +505,8 @@ int _peakMinAltitude() {
                   _applyZoomPreset(_currentZoom);
                 }
               });
+
+              _scheduleSelectedPoiVisibilitySync();
             },
           ),
           children: [
@@ -385,19 +540,26 @@ int _peakMinAltitude() {
               MarkerLayer(
                 markers: _visiblePeaks.map((poi) {
                   final showLabel = _showPeakLabels();
+                  final isSelected = _isSelectedPoi(poi);
+
                   return Marker(
                     point: poi.location,
-                    width: showLabel ? 76 : 16,
-                    height: showLabel ? 42 : 16,
-                    child: _PoiMarker(
-                      icon: _getPoiIcon(poi.type),
-                      label: showLabel
-                          ? (_showPeakAltitude() && poi.altitude != null
-                              ? '${poi.name} ${poi.altitude!.toInt()} m'
-                              : poi.name)
-                          : null,
-                      fontSize: 8,
-                      maxLines: 2,
+                    width: showLabel ? 84 : 24,
+                    height: showLabel ? 50 : 24,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => _selectPoi(poi),
+                      child: _PoiMarker(
+                        icon: _getPoiIcon(poi.type),
+                        label: showLabel
+                            ? (_showPeakAltitude() && poi.altitude != null
+                                ? '${poi.name} ${poi.altitude!.toStringAsFixed(0)} m'
+                                : poi.name)
+                            : null,
+                        fontSize: 8,
+                        maxLines: 2,
+                        isSelected: isSelected,
+                      ),
                     ),
                   );
                 }).toList(),
@@ -406,15 +568,22 @@ int _peakMinAltitude() {
               MarkerLayer(
                 markers: _visibleCities.map((poi) {
                   final showLabel = _showCityLabels();
+                  final isSelected = _isSelectedPoi(poi);
+
                   return Marker(
                     point: poi.location,
-                    width: showLabel ? 74 : 18,
-                    height: showLabel ? 34 : 18,
-                    child: _PoiMarker(
-                      icon: _getPoiIcon(poi.type),
-                      label: showLabel ? poi.name : null,
-                      fontSize: 8,
-                      maxLines: 1,
+                    width: showLabel ? 82 : 24,
+                    height: showLabel ? 40 : 24,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => _selectPoi(poi),
+                      child: _PoiMarker(
+                        icon: _getPoiIcon(poi.type),
+                        label: showLabel ? poi.name : null,
+                        fontSize: 8,
+                        maxLines: 1,
+                        isSelected: isSelected,
+                      ),
                     ),
                   );
                 }).toList(),
@@ -454,8 +623,34 @@ int _peakMinAltitude() {
                 child: const Icon(Icons.layers, color: Colors.white),
               ),
               const SizedBox(height: 4),
+              if (_selectedPoi != null) ...[
+                if (_hasPrevNextPoiControls) ...[
+                  FloatingActionButton.small(
+                    heroTag: 'prev_poi',
+                    onPressed: () => _selectRelativePoi(-1),
+                    backgroundColor: Colors.black87,
+                    child: const Icon(Icons.chevron_left, color: Colors.white),
+                  ),
+                  const SizedBox(height: 4),
+                  FloatingActionButton.small(
+                    heroTag: 'next_poi',
+                    onPressed: () => _selectRelativePoi(1),
+                    backgroundColor: Colors.black87,
+                    child: const Icon(Icons.chevron_right, color: Colors.white),
+                  ),
+                  const SizedBox(height: 4),
+                ],
+                FloatingActionButton.small(
+                  heroTag: 'clear_selected_poi',
+                  onPressed: _clearSelectedPoi,
+                  backgroundColor: Colors.black87,
+                  child: const Icon(Icons.close, color: Colors.white),
+                ),
+                const SizedBox(height: 4),
+              ],
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.black87,
                   borderRadius: BorderRadius.circular(8),
@@ -497,7 +692,8 @@ int _peakMinAltitude() {
               ),
               const SizedBox(height: 4),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.black87,
                   borderRadius: BorderRadius.circular(8),
@@ -537,44 +733,69 @@ class _PoiMarker extends StatelessWidget {
   final String? label;
   final double fontSize;
   final int maxLines;
+  final bool isSelected;
 
   const _PoiMarker({
     required this.icon,
     required this.label,
     required this.fontSize,
     required this.maxLines,
+    this.isSelected = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (label == null || label!.isEmpty) {
-      return Center(child: icon);
+    final markerContent = label == null || label!.isEmpty
+        ? Center(child: icon)
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              icon,
+              const SizedBox(height: 1),
+              Flexible(
+                child: Text(
+                  label!,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: fontSize,
+                    fontWeight:
+                        isSelected ? FontWeight.w900 : FontWeight.bold,
+                    height: 1.0,
+                    shadows: const [
+                      Shadow(blurRadius: 4, color: Colors.black),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: maxLines,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                ),
+              ),
+            ],
+          );
+
+    if (!isSelected) {
+      return markerContent;
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        icon,
-        const SizedBox(height: 1),
-        Flexible(
-          child: Text(
-            label!,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              height: 1.0,
-              shadows: const [
-                Shadow(blurRadius: 4, color: Colors.black),
-              ],
-            ),
-            textAlign: TextAlign.center,
-            maxLines: maxLines,
-            overflow: TextOverflow.ellipsis,
-            softWrap: true,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.75),
+          width: 1.2,
         ),
-      ],
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black54,
+            blurRadius: 8,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: markerContent,
     );
   }
 }
