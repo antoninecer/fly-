@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
+
 import '../../../data/db/app_database.dart';
+import '../../../data/export/session_export_service.dart';
 import '../../../data/repositories/session_repository.dart';
 import '../../replay/presentation/replay_screen.dart';
 
 class ArchiveScreen extends StatefulWidget {
-  const ArchiveScreen({super.key});
+  final ValueChanged<String>? onPlaySession;
+
+  const ArchiveScreen({super.key, this.onPlaySession});
 
   @override
   State<ArchiveScreen> createState() => _ArchiveScreenState();
@@ -14,6 +19,8 @@ class ArchiveScreen extends StatefulWidget {
 class _ArchiveScreenState extends State<ArchiveScreen> {
   late AppDatabase _db;
   late SessionRepository _repository;
+  late SessionExportService _exportService;
+
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy HH:mm');
 
   @override
@@ -21,6 +28,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
     super.initState();
     _db = AppDatabase();
     _repository = SessionRepository(_db);
+    _exportService = SessionExportService(_db);
   }
 
   @override
@@ -30,11 +38,38 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   }
 
   void _playSession(String sessionId) {
+    if (widget.onPlaySession != null) {
+      widget.onPlaySession!(sessionId);
+      return;
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ReplayScreen(sessionId: sessionId),
       ),
     );
+  }
+
+  Future<void> _exportSession(Session session) async {
+    try {
+      final file = await _exportService.exportSessionAsKml(session.id);
+
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'FLY2 export: ${session.title}',
+        subject: session.title,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Exported "${session.title}" as KML')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $e')),
+      );
+    }
   }
 
   Future<void> _deleteSession(Session session) async {
@@ -44,7 +79,10 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
         title: const Text('Delete Session?'),
         content: Text('Are you sure you want to delete "${session.title}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -80,12 +118,15 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  
+
                   final sessions = snapshot.data ?? [];
-                  
+
                   if (sessions.isEmpty) {
                     return const Center(
-                      child: Text('No sessions found in archive.', style: TextStyle(color: Colors.white54)),
+                      child: Text(
+                        'No sessions found in archive.',
+                        style: TextStyle(color: Colors.white54),
+                      ),
                     );
                   }
 
@@ -97,6 +138,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                         session: session,
                         dateLabel: _dateFormat.format(session.startedAt),
                         onPlay: () => _playSession(session.id),
+                        onExport: () => _exportSession(session),
                         onDelete: () => _deleteSession(session),
                       );
                     },
@@ -143,12 +185,14 @@ class _ArchiveItemCard extends StatelessWidget {
   final Session session;
   final String dateLabel;
   final VoidCallback onPlay;
+  final VoidCallback onExport;
   final VoidCallback onDelete;
 
   const _ArchiveItemCard({
     required this.session,
     required this.dateLabel,
     required this.onPlay,
+    required this.onExport,
     required this.onDelete,
   });
 
@@ -166,7 +210,9 @@ class _ArchiveItemCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  session.type == 'flight' ? Icons.flight_takeoff : Icons.gps_fixed,
+                  session.type == 'flight'
+                      ? Icons.flight_takeoff
+                      : Icons.gps_fixed,
                   color: Colors.blueAccent,
                   size: 20,
                 ),
@@ -174,17 +220,24 @@ class _ArchiveItemCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     session.title,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 if (isDemo)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.amber.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text('DEMO', style: TextStyle(fontSize: 10, color: Colors.amber)),
+                    child: const Text(
+                      'DEMO',
+                      style: TextStyle(fontSize: 10, color: Colors.amber),
+                    ),
                   ),
               ],
             ),
@@ -196,29 +249,44 @@ class _ArchiveItemCard extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 12, color: Colors.white54),
+                const Icon(Icons.calendar_today,
+                    size: 12, color: Colors.white54),
                 const SizedBox(width: 4),
-                Text(dateLabel, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                Text(
+                  dateLabel,
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                ),
                 const SizedBox(width: 16),
                 const Icon(Icons.timer, size: 12, color: Colors.white54),
                 const SizedBox(width: 4),
-                Text(_formatDuration(session.durationSec), style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                Text(
+                  _formatDuration(session.durationSec),
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                ),
               ],
             ),
             const SizedBox(height: 16),
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 FilledButton.icon(
                   onPressed: onPlay,
                   icon: const Icon(Icons.play_arrow, size: 18),
                   label: const Text('Play'),
                 ),
-                const SizedBox(width: 8),
+                OutlinedButton.icon(
+                  onPressed: onExport,
+                  icon: const Icon(Icons.download, size: 18),
+                  label: const Text('Export'),
+                ),
                 OutlinedButton.icon(
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline, size: 18),
                   label: const Text('Delete'),
-                  style: OutlinedButton.styleFrom(foregroundColor: Colors.redAccent),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.redAccent,
+                  ),
                 ),
               ],
             ),

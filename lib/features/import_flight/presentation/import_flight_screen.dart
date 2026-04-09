@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../../../data/db/app_database.dart';
 import '../../../data/services/aviationstack_service.dart';
 
 class ImportFlightScreen extends StatefulWidget {
@@ -21,6 +23,7 @@ class _ImportFlightScreenState extends State<ImportFlightScreen> {
   final _apiKeyController = TextEditingController();
 
   final AviationstackService _aviationstackService = AviationstackService();
+  late final AppDatabase _db;
 
   bool _useApiLookup = true;
   bool _isLoading = false;
@@ -34,6 +37,7 @@ class _ImportFlightScreenState extends State<ImportFlightScreen> {
   @override
   void initState() {
     super.initState();
+    _db = AppDatabase();
     _loadAirports();
   }
 
@@ -45,6 +49,7 @@ class _ImportFlightScreenState extends State<ImportFlightScreen> {
     _dateTimeController.dispose();
     _notesController.dispose();
     _apiKeyController.dispose();
+    _db.close();
     super.dispose();
   }
 
@@ -134,6 +139,125 @@ class _ImportFlightScreenState extends State<ImportFlightScreen> {
     });
   }
 
+  AirportItem? _resolveAirport(String value) {
+    final q = value.trim().toLowerCase();
+    if (q.isEmpty) return null;
+
+    for (final airport in _airports) {
+      if (airport.displayLabel.toLowerCase() == q) return airport;
+    }
+
+    for (final airport in _airports) {
+      if (airport.iata.toLowerCase() == q || airport.ident.toLowerCase() == q) {
+        return airport;
+      }
+    }
+
+    for (final airport in _airports) {
+      if (airport.name.toLowerCase() == q || airport.city.toLowerCase() == q) {
+        return airport;
+      }
+    }
+
+    for (final airport in _airports) {
+      if (airport.displayLabel.toLowerCase().contains(q)) return airport;
+    }
+
+    return null;
+  }
+
+  DateTime _parsePlannedTime(String raw) {
+    final text = raw.trim();
+    if (text.isEmpty) return DateTime.now();
+
+    final iso = DateTime.tryParse(text);
+    if (iso != null) return iso.toLocal();
+
+    final m = RegExp(
+      r'^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})$',
+    ).firstMatch(text);
+
+    if (m != null) {
+      return DateTime(
+        int.parse(m.group(1)!),
+        int.parse(m.group(2)!),
+        int.parse(m.group(3)!),
+        int.parse(m.group(4)!),
+        int.parse(m.group(5)!),
+      );
+    }
+
+    return DateTime.now();
+  }
+
+  Future<void> _saveActiveFlight({
+    required String flightNumber,
+    required String fromText,
+    required String toText,
+    required String dateTimeText,
+    required String notes,
+    required String sourceType,
+    String? apiStatus,
+  }) async {
+    final fromAirport = _resolveAirport(fromText);
+    final toAirport = _resolveAirport(toText);
+    final plannedTime = _parsePlannedTime(dateTimeText);
+
+    final fromName = fromAirport?.displayLabel.isNotEmpty == true
+        ? fromAirport!.displayLabel
+        : fromText;
+    final toName = toAirport?.displayLabel.isNotEmpty == true
+        ? toAirport!.displayLabel
+        : toText;
+
+    final title = flightNumber.isNotEmpty
+        ? flightNumber
+        : '${fromName.isEmpty ? 'Unknown' : fromName} → ${toName.isEmpty ? 'Unknown' : toName}';
+
+    final sessionId = 'active-${DateTime.now().millisecondsSinceEpoch}';
+
+    await _db.transaction(() async {
+      await (_db.update(_db.sessions)).write(
+        const SessionsCompanion(
+          isActive: drift.Value(false),
+        ),
+      );
+
+      await _db.into(_db.sessions).insert(
+            SessionsCompanion.insert(
+              id: sessionId,
+              type: 'flight',
+              title: title,
+              fromName: drift.Value(fromName.isEmpty ? null : fromName),
+              toName: drift.Value(toName.isEmpty ? null : toName),
+              fromLat: drift.Value(fromAirport?.lat),
+              fromLon: drift.Value(fromAirport?.lon),
+              toLat: drift.Value(toAirport?.lat),
+              toLon: drift.Value(toAirport?.lon),
+              startedAt: plannedTime,
+              endedAt: const drift.Value(null),
+              durationSec: const drift.Value(0),
+              distanceKm: const drift.Value(0.0),
+              isActive: const drift.Value(true),
+              sourceType: sourceType,
+              notes: drift.Value(
+                [
+                  if (apiStatus != null && apiStatus.trim().isNotEmpty)
+                    'Status: $apiStatus',
+                  if (notes.trim().isNotEmpty) notes.trim(),
+                ].join('\n').trim().isEmpty
+                    ? null
+                    : [
+                        if (apiStatus != null && apiStatus.trim().isNotEmpty)
+                          'Status: $apiStatus',
+                        if (notes.trim().isNotEmpty) notes.trim(),
+                      ].join('\n'),
+              ),
+            ),
+          );
+    });
+  }
+
   Future<void> _importFlight() async {
     FocusScope.of(context).unfocus();
 
@@ -142,6 +266,7 @@ class _ImportFlightScreenState extends State<ImportFlightScreen> {
     final to = _toController.text.trim();
     final dateTime = _dateTimeController.text.trim();
     final apiKey = _apiKeyController.text.trim();
+    final notes = _notesController.text.trim();
 
     if (_useApiLookup) {
       if (flightNumber.isEmpty) {
@@ -173,17 +298,31 @@ class _ImportFlightScreenState extends State<ImportFlightScreen> {
           flightNumber: flightNumber,
         );
 
+        final resolvedFrom =
+            result.departureIata ?? result.departureAirport ?? from;
+        final resolvedTo = result.arrivalIata ?? result.arrivalAirport ?? to;
+        final resolvedDateTime = result.departureScheduled ?? dateTime;
+
+        await _saveActiveFlight(
+          flightNumber: result.flightNumber,
+          fromText: resolvedFrom,
+          toText: resolvedTo,
+          dateTimeText: resolvedDateTime,
+          notes: notes,
+          sourceType: 'api',
+          apiStatus: result.flightStatus,
+        );
+
         if (!mounted) return;
 
         setState(() {
-          _fromController.text =
-              result.departureIata ?? result.departureAirport ?? '';
-          _toController.text =
-              result.arrivalIata ?? result.arrivalAirport ?? '';
-          _dateTimeController.text = result.departureScheduled ?? dateTime;
+          _fromController.text = resolvedFrom;
+          _toController.text = resolvedTo;
+          _dateTimeController.text = resolvedDateTime;
           _isLoading = false;
-          _status = 'Flight imported from API';
-          _resultSummary = result.toSummary();
+          _status = 'Flight imported and activated';
+          _resultSummary =
+              '${result.toSummary()}\n\nActive flight was updated for Flight screen.';
         });
       } catch (e) {
         if (!mounted) return;
@@ -211,20 +350,37 @@ class _ImportFlightScreenState extends State<ImportFlightScreen> {
       _resultSummary = null;
     });
 
-    await Future.delayed(const Duration(milliseconds: 300));
+    try {
+      await _saveActiveFlight(
+        flightNumber: flightNumber,
+        fromText: from,
+        toText: to,
+        dateTimeText: dateTime,
+        notes: notes,
+        sourceType: 'manual',
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      _isLoading = false;
-      _status = 'Manual flight prepared';
-      _resultSummary =
-          'Flight: ${flightNumber.isEmpty ? "(manual route)" : flightNumber}\n'
-          'From: ${from.isEmpty ? "-" : from}\n'
-          'To: ${to.isEmpty ? "-" : to}\n'
-          'Date/Time: ${dateTime.isEmpty ? "-" : dateTime}\n'
-          'Notes: ${_notesController.text.trim().isEmpty ? "-" : _notesController.text.trim()}';
-    });
+      setState(() {
+        _isLoading = false;
+        _status = 'Manual flight imported and activated';
+        _resultSummary =
+            'Flight: ${flightNumber.isEmpty ? "(manual route)" : flightNumber}\n'
+            'From: ${from.isEmpty ? "-" : from}\n'
+            'To: ${to.isEmpty ? "-" : to}\n'
+            'Date/Time: ${dateTime.isEmpty ? "-" : dateTime}\n'
+            'Notes: ${notes.isEmpty ? "-" : notes}\n\n'
+            'Active flight was updated for Flight screen.';
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _status = 'Manual import failed';
+        _resultSummary = e.toString();
+      });
+    }
   }
 
   void _createRoute() {
@@ -369,7 +525,9 @@ class _ImportFormCard extends StatelessWidget {
               airports: airports,
               enabled: airportsLoaded,
               label: 'From airport / city',
-              hint: airportsLoaded ? 'Type airport, city, IATA or ICAO' : 'Loading airports...',
+              hint: airportsLoaded
+                  ? 'Type airport, city, IATA or ICAO'
+                  : 'Loading airports...',
               icon: Icons.flight_takeoff,
             ),
             const SizedBox(height: 12),
@@ -378,7 +536,9 @@ class _ImportFormCard extends StatelessWidget {
               airports: airports,
               enabled: airportsLoaded,
               label: 'To airport / city',
-              hint: airportsLoaded ? 'Type airport, city, IATA or ICAO' : 'Loading airports...',
+              hint: airportsLoaded
+                  ? 'Type airport, city, IATA or ICAO'
+                  : 'Loading airports...',
               icon: Icons.flight_land,
             ),
             const SizedBox(height: 12),
@@ -429,7 +589,8 @@ class _AirportAutocompleteField extends StatefulWidget {
   });
 
   @override
-  State<_AirportAutocompleteField> createState() => _AirportAutocompleteFieldState();
+  State<_AirportAutocompleteField> createState() =>
+      _AirportAutocompleteFieldState();
 }
 
 class _AirportAutocompleteFieldState extends State<_AirportAutocompleteField> {

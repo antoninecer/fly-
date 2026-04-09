@@ -48,6 +48,7 @@ dependencies:
   intl: ^0.20.2
   geolocator: ^14.0.2
   http: ^1.2.2
+  share_plus: ^10.0.2
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +84,7 @@ flutter:
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
+  
   assets:
     - data/maps/source/world_base_z4_z5.mbtiles
     - data/maps/source/europe_detail_z6_z7.mbtiles
@@ -94,6 +96,7 @@ flutter:
     - data/source/eu_cities_medium.json
     - data/source/eu_peaks_major.json
     - assets/icons/map_placeholder.png
+    - assets/tracks/prg_nap.kml
   
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package

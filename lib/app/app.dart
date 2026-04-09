@@ -31,7 +31,15 @@ class RootShell extends StatefulWidget {
 
 class _RootShellState extends State<RootShell> {
   int index = 0;
-  String? _replaySessionId;
+
+  final List<Widget> screens = const [
+    FlightScreen(),
+    ImportFlightScreen(),
+    TrackerScreen(),
+    ReplayScreen(),
+    ArchiveScreen(),
+    MapsScreen(),
+  ];
 
   final List<String> titles = const [
     'Flight',
@@ -50,33 +58,8 @@ class _RootShellState extends State<RootShell> {
     );
   }
 
-  void _openReplayInShell(String sessionId) {
-    setState(() {
-      _replaySessionId = sessionId;
-      index = 3;
-    });
-  }
-
-  List<Widget> _buildScreens() {
-    return [
-      const FlightScreen(),
-      const ImportFlightScreen(),
-      const TrackerScreen(),
-      ReplayScreen(
-        key: ValueKey('replay:${_replaySessionId ?? 'demo-prague-naples'}'),
-        sessionId: _replaySessionId,
-      ),
-      ArchiveScreen(
-        onPlaySession: _openReplayInShell,
-      ),
-      const MapsScreen(),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
-    final screens = _buildScreens();
-
     return Scaffold(
       appBar: AppBar(
         title: Text('FLY2 · ${titles[index]}'),
@@ -88,10 +71,7 @@ class _RootShellState extends State<RootShell> {
           ),
         ],
       ),
-      body: IndexedStack(
-        index: index,
-        children: screens,
-      ),
+      body: screens[index],
       bottomNavigationBar: NavigationBar(
         selectedIndex: index,
         onDestinationSelected: (value) => setState(() => index = value),

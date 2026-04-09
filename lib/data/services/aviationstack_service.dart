@@ -36,7 +36,7 @@ class AviationstackFlightResult {
 }
 
 class AviationstackService {
-  static const String _baseUrl = 'http://api.aviationstack.com/v1/flights';
+  static const String _baseUrl = 'https://api.aviationstack.com/v1/flights';
 
   Future<AviationstackFlightResult> lookupFlight({
     required String apiKey,

@@ -34,7 +34,6 @@ class _FlightScreenState extends State<FlightScreen> {
 
   int leftInfoIndex = 0;
   int rightInfoIndex = 0;
-  int _routeDisplayMode = 0;
 
   Poi? _selectedPoi;
   Session? _activeFlight;
@@ -147,7 +146,7 @@ class _FlightScreenState extends State<FlightScreen> {
     String startsIn = '--:--';
 
     if (diff.inSeconds > 0) {
-      startsIn = _formatStartsIn(diff);
+      startsIn = _formatDurationShort(diff);
       remaining = startsIn;
       elapsed = '00:00';
     } else {
@@ -155,8 +154,11 @@ class _FlightScreenState extends State<FlightScreen> {
       elapsed = _formatDurationShort(flown);
 
       if (session.durationSec > 0) {
-        final remain = Duration(seconds: session.durationSec) - flown;
-        remaining = remain.isNegative ? '00:00' : _formatDurationShort(remain);
+        final remain =
+            Duration(seconds: session.durationSec) - flown;
+        remaining = remain.isNegative
+            ? '00:00'
+            : _formatDurationShort(remain);
 
         final endTime = start.add(Duration(seconds: session.durationSec));
         eta = _formatClock(endTime);
@@ -182,12 +184,6 @@ class _FlightScreenState extends State<FlightScreen> {
   void _cycleRightInfo() {
     setState(() {
       rightInfoIndex = (rightInfoIndex + 1) % 5;
-    });
-  }
-
-  void _cycleRouteDisplayMode() {
-    setState(() {
-      _routeDisplayMode = (_routeDisplayMode + 1) % 4;
     });
   }
 
@@ -232,35 +228,22 @@ class _FlightScreenState extends State<FlightScreen> {
   }
 
   Map<String, String> _rightInfo() {
-    final flightInFuture =
-        _activeFlight != null &&
-        _activeFlight!.startedAt.isAfter(DateTime.now());
-
     switch (rightInfoIndex) {
       case 0:
-        return {
-          'label': flightInFuture ? 'STARTS IN' : 'ELAPSED',
-          'value': flightInFuture ? _startsIn : _elapsed,
-        };
+        return {'label': 'STARTS IN', 'value': _startsIn};
       case 1:
-        return {'label': 'REMAIN', 'value': _remaining};
+        return {'label': 'ELAPSED', 'value': _elapsed};
       case 2:
-        return {'label': 'ETA', 'value': _eta};
+        return {'label': 'REMAIN', 'value': _remaining};
       case 3:
+        return {'label': 'ETA', 'value': _eta};
+      case 4:
         return {
           'label': 'DEV',
           'value': '${_routeDeviationKm.toStringAsFixed(1)} km',
         };
-      case 4:
-        return {
-          'label': flightInFuture ? 'ELAPSED' : 'STARTS IN',
-          'value': flightInFuture ? _elapsed : _startsIn,
-        };
       default:
-        return {
-          'label': flightInFuture ? 'STARTS IN' : 'ELAPSED',
-          'value': flightInFuture ? _startsIn : _elapsed,
-        };
+        return {'label': 'STARTS IN', 'value': _startsIn};
     }
   }
 
@@ -276,72 +259,12 @@ class _FlightScreenState extends State<FlightScreen> {
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
-  String _formatStartsIn(Duration d) {
-    final totalMinutes = d.inMinutes;
-    final days = totalMinutes ~/ (24 * 60);
-    final hours = (totalMinutes % (24 * 60)) ~/ 60;
-    final minutes = totalMinutes % 60;
-
-    if (days > 0) {
-      return '${days}d ${hours}h';
-    }
-    if (hours > 0) {
-      return '${hours}h ${minutes}m';
-    }
-    return '${minutes}m';
-  }
-
   String _formatClock(DateTime dt) {
     final local = dt.toLocal();
     final hh = local.hour.toString().padLeft(2, '0');
     final mm = local.minute.toString().padLeft(2, '0');
     return '$hh:$mm';
   }
-
-  String _extractAirportCode(String value) {
-    final parts = value.split('—');
-    if (parts.isNotEmpty) {
-      final code = parts.first.trim();
-      if (code.isNotEmpty) return code;
-    }
-    return value.trim();
-  }
-
-  String _extractCityName(String value) {
-    final parts = value.split('—').map((e) => e.trim()).toList();
-    if (parts.length >= 2 && parts[1].isNotEmpty) {
-      return parts[1];
-    }
-    return value.trim();
-  }
-
-  String _extractAirportName(String value) {
-    final parts = value.split('—').map((e) => e.trim()).toList();
-    if (parts.length >= 3 && parts[2].isNotEmpty) {
-      return parts[2];
-    }
-    if (parts.length >= 2 && parts[1].isNotEmpty) {
-      return parts[1];
-    }
-    return value.trim();
-  }
-
-  String _routeText() {
-    switch (_routeDisplayMode) {
-      case 0:
-        return '${_extractCityName(_fromName)} → ${_extractCityName(_toName)}';
-      case 1:
-        return '${_extractAirportCode(_fromName)} → ${_extractAirportCode(_toName)}';
-      case 2:
-        return '${_extractAirportName(_fromName)} → ${_extractAirportName(_toName)}';
-      case 3:
-        return '${_extractCityName(_fromName)} → ${_extractCityName(_toName)}';
-      default:
-        return '${_extractCityName(_fromName)} → ${_extractCityName(_toName)}';
-    }
-  }
-
-  bool _glassMode() => _routeDisplayMode == 3;
 
   @override
   void dispose() {
@@ -405,11 +328,16 @@ class _FlightScreenState extends State<FlightScreen> {
             top: 12,
             left: 12,
             right: 12,
-            child: _TopRouteBar(
-              routeText: _routeText(),
-              status: _status,
-              onTap: _cycleRouteDisplayMode,
-              glassMode: _glassMode(),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _TopRouteBar(
+                    from: _fromName,
+                    to: _toName,
+                    status: _status,
+                  ),
+                ),
+              ],
             ),
           ),
           Positioned(
@@ -449,51 +377,40 @@ class _FlightScreenState extends State<FlightScreen> {
 }
 
 class _TopRouteBar extends StatelessWidget {
-  final String routeText;
+  final String from;
+  final String to;
   final String status;
-  final VoidCallback onTap;
-  final bool glassMode;
 
   const _TopRouteBar({
-    required this.routeText,
+    required this.from,
+    required this.to,
     required this.status,
-    required this.onTap,
-    required this.glassMode,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        color: glassMode
-            ? Colors.black.withValues(alpha: 0.35)
-            : Colors.black.withValues(alpha: 0.70),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: Row(
-            children: [
-              const Icon(Icons.flight, size: 18),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  routeText,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    height: 1.15,
-                  ),
+    return Card(
+      color: Colors.black.withValues(alpha: 0.70),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Row(
+          children: [
+            const Icon(Icons.flight, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$from → $to',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
-              const SizedBox(width: 8),
-              Text(
-                status,
-                style: const TextStyle(color: Colors.white70),
-              ),
-            ],
-          ),
+            ),
+            Text(
+              status,
+              style: const TextStyle(color: Colors.white70),
+            ),
+          ],
         ),
       ),
     );
